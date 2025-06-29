@@ -1,0 +1,19 @@
+// Grades
+export const API_GRADES_ENDPOINT = "/api/grades/";
+
+// Organigrammes
+export const API_ORGANIGRAMMES_ENDPOINT = "/api/organigrams/";
+
+// Positions
+export const API_POSITIONS_ENDPOINT = "/api/positions/";
+
+// Edges
+export const API_EDGES_ENDPOINT = "/api/edges/";
+
+
+// AUTH
+
+export const API_USERS_ENDPOINT = "/auth/user-list/"
+export const API_USER_PROFILE_ENDPOINT = "/api/auth/profiles/"
+export const API_LOGIN_ENDPOINT = "/api/login/"
+export const API_LOGOUT_ENDPOINT = "/api/logout/"
