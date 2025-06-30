@@ -4,7 +4,7 @@ import { Col, Row, Tag } from "antd";
 import { renderText } from "@/utils/functions";
 import Delete from "@/components/Delete";
 import AUForm from "./components/AUForm";
-import { API_SOUSARTICLES_ENDPOINT } from "@/api/api";
+import { API_ORGANIGRAMMES_ENDPOINT } from "@/api/api";
 
 export const getColumns = (refetch: () => void): ProColumns<any>[] => [
   {
@@ -100,7 +100,7 @@ export const getColumns = (refetch: () => void): ProColumns<any>[] => [
             <Row gutter={8}>
               <Col>
                 <Delete
-                  url={API_SOUSARTICLES_ENDPOINT}
+                  url={API_ORGANIGRAMMES_ENDPOINT}
                   id={record?.id}
                   refetch={refetch}
                   class_name="Sous Article"

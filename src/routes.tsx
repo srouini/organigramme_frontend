@@ -7,7 +7,7 @@ import ProtectedRoute from './components/_ProtectedRoute';
 import NotFoundPage from "./pages/NotFoundPage/Index"
 import GradesPage from './pages/Grades/index';
 import PositionsPage from './pages/Positions/index';
-import OrganigrammesPage from './pages/Organigramme/index';
+import OrganigrammesDetailsPage from './pages/Organigramme/OrganigramDetails/index';
 
 
 
@@ -22,7 +22,7 @@ const AppRoutes = () => (
         <Route path="/grades" element={<GradesPage />} />
         <Route path="/positions" element={<PositionsPage />} />
         <Route path="/organigrammes" element={<OrganigrammesPage />} />
-        <Route path="/organigrammes/:id" element={<OrganigrammesPage />} />
+        <Route path="/organigrammes/:id" element={<OrganigrammesDetailsPage />} />
       </Route>
 
       <Route path="*" element={<NotFoundPage />} />

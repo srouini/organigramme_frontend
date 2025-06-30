@@ -7,7 +7,7 @@ import { mapInitialValues } from "@/utils/functions";
 import { useReferenceContext } from "@/context/ReferenceContext";
 import { API_ORGANIGRAMMES_ENDPOINT } from "@/api/api";
 import FormField from "@/components/form/FormField";
-import { YES_NO_CHOICES } from "@/utils/constants";
+import { ORGANIGRAMME_STATES, YES_NO_CHOICES } from "@/utils/constants";
 import { EditOutlined, PlusOutlined } from "@ant-design/icons";
 import { usePermissions } from "@/utils/permissions";
 
@@ -18,8 +18,7 @@ const formatDate = (field: string, values: any) => {
 
 interface AUFormProps {
   refetch: () => void;
-  initialvalues: any;
-  article: any;
+  initialvalues?: any;
   editText?: string;
   addText?: string;
   hasIcon?: boolean;
@@ -30,7 +29,6 @@ interface AUFormProps {
 const AUForm: React.FC<AUFormProps> = ({
   refetch,
   initialvalues,
-  article,
   editText = "MODIFIER",
   addText = "Mrn",
   hasIcon = false,
@@ -43,8 +41,6 @@ const AUForm: React.FC<AUFormProps> = ({
     let values = await form.validateFields();
     if (initialvalues) {
       values.id = initialvalues?.id;
-    }else{
-      values.article = parseInt(article);
     }
     
     mutate(values);
@@ -65,9 +61,9 @@ const AUForm: React.FC<AUFormProps> = ({
 
   return (
     <DraggableModel
-      OkButtontext="Submit"
+      OkButtontext="Sumettre"
       modalOpenButtonText={initialvalues ? editText : addText} 
-      modalTitle="Conteneur"
+      modalTitle="Organigramme"
       addButtonType="dashed"
       addButtonIcon={
         hasIcon && initialvalues ? <EditOutlined /> : <PlusOutlined />
@@ -83,38 +79,23 @@ const AUForm: React.FC<AUFormProps> = ({
       <FormObject form={form} initialvalues={mapInitialValues(initialvalues)}>
         <Row gutter={24}>
           <FormField
-            name="tc"
-            label="Matricule"
-            type="text"
-            required
-            span_md={24}
-          />
-          <FormField name="tar" label="Tar" type="text" required span_md={24} />
-          <FormField
-            name="poids"
-            label="Poids"
+            name="name"
+            label="Nom"
             type="text"
             required
             span_md={24}
           />
           <Divider style={{ marginTop: "0px" }} />
           <FormField
-            name="dangereux"
-            label="Dangereux"
+            name="state"
+            label="Etat"
             type="select"
-            options={YES_NO_CHOICES}
+            options={ORGANIGRAMME_STATES}
             required
             option_value="value"
             span_md={24}
           />
-          <FormField
-            name="frigo"
-            label="Frigo"
-            type="select"
-            options={YES_NO_CHOICES}
-            option_value="value"
-            span_md={24}
-          />
+
         </Row>
       </FormObject>
     </DraggableModel>

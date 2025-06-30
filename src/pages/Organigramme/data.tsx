@@ -3,7 +3,7 @@ import { TableDropdown } from "@ant-design/pro-components";
 import { Col, Popover, Row, Space, Tag, Tooltip } from "antd";
 import { getStatusColor, renderDate, renderDateTime, renderText } from "@/utils/functions";
 import { API_ORGANIGRAMMES_ENDPOINT } from "@/api/api";
-import SubArticlePage from "./ContainerDetails";
+import SubArticlePage from "./OrganigramDetails";
 import Delete from "@/components/Delete";
 import AUForm from "./components/AUForm";
 import Print from "@/components/Print";
@@ -27,9 +27,9 @@ export const getMetas = (
   },
 
   /** ---------- Date (“Créé le”) ---------- */
-  description: {
+  content: {
     title: 'Créé le',
-    render: (_, row) => renderDate(row.created_at),
+    render: (_, row) =><><span>Créé le</span> <span style={{marginLeft:"5px",color:"#6c757d",fontWeight:"bold"}}> {renderDate(row.created_at)}</span></> ,
   },
 
   /** ---------- Per‑card actions ---------- */
@@ -59,7 +59,6 @@ export const getMetas = (
             <AUForm
               initialvalues={record}
               refetch={refetch}
-              article={record.article}
               editText=""
               hasIcon
             />

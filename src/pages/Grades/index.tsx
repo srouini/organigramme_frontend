@@ -13,6 +13,7 @@ import { useReferenceContext } from "@/context/ReferenceContext";
 import { message, Segmented } from "antd";
 import usePost from "@/hooks/usePost";
 import Export from "./components/Export";
+import AUForm from "./components/AUForm";
 
 export default () => {
   const { containerType } = useReferenceContext();
@@ -92,6 +93,7 @@ export default () => {
         title: "Grades",
         extra: [
           <Export endpoint={API_GRADES_ENDPOINT} expand="type_tc,current_scelle,article.gros,charge_chargement" key="ALLCONTAINERS" />,
+          <AUForm refetch={refetch} addText="Grade"></AUForm>
         ]
          
       }}

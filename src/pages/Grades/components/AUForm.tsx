@@ -1,15 +1,18 @@
 import { useEffect, useState } from "react";
 import DraggableModel from "@/components/DraggableModel";
 import FormObject from "@/components/Form";
-import { Divider, Form, message, Row } from "antd";
+import { Col, ColorPicker, Divider, Form, message, Row } from "antd";
 import usePost from "@/hooks/usePost";
 import { mapInitialValues } from "@/utils/functions";
 import { useReferenceContext } from "@/context/ReferenceContext";
-import { API_GRADES_ENDPOINT } from "@/api/api";
+import { API_GRADES_ENDPOINT, API_ORGANIGRAMMES_ENDPOINT } from "@/api/api";
 import FormField from "@/components/form/FormField";
-import { YES_NO_CHOICES } from "@/utils/constants";
+import { ORGANIGRAMME_STATES, YES_NO_CHOICES } from "@/utils/constants";
 import { EditOutlined, PlusOutlined } from "@ant-design/icons";
 import { usePermissions } from "@/utils/permissions";
+import TextArea from "antd/es/input/TextArea";
+import type { Color } from 'antd/es/color-picker';
+
 
 const formatDate = (field: string, values: any) => {
   if (values[field]) values[field] = values[field].format("YYYY-MM-DD");
@@ -18,44 +21,40 @@ const formatDate = (field: string, values: any) => {
 
 interface AUFormProps {
   refetch: () => void;
-  initialvalues: any;
-  article: any;
+  initialvalues?: any;
   editText?: string;
   addText?: string;
   hasIcon?: boolean;
-  disabled?:boolean
-
+  disabled?: boolean;
 }
 
 const AUForm: React.FC<AUFormProps> = ({
   refetch,
   initialvalues,
-  article,
   editText = "MODIFIER",
   addText = "Mrn",
   hasIcon = false,
-  disabled=false
+  disabled = false,
 }) => {
   const [form] = Form.useForm();
   const [open, setOpen] = useState(false);
 
-  const { containerType } = useReferenceContext();
+  const [colorHex, setColorHex] = useState<string>('#1677ff');
 
-  useEffect(() => {
-    containerType.fetch();
-  }, []);
-
-  const {} = useReferenceContext();
+   const handleChange = (color: Color) => {
+    const hex = color.toHexString(); // get color in hex
+    setColorHex(hex);
+    console.log('Selected Color:', hex);
+  };
 
   const handleFormSubmission = async () => {
     let values = await form.validateFields();
     if (initialvalues) {
-      values.id = initialvalues?.id;
-    }else{
-      values.article = parseInt(article);
+      values["id"] = initialvalues?.id;
     }
-    
-    values = formatDate("accostage", values);
+    if (colorHex) {
+      values["color"]= colorHex;
+    }
     mutate(values);
   };
 
@@ -74,14 +73,18 @@ const AUForm: React.FC<AUFormProps> = ({
 
   return (
     <DraggableModel
-      OkButtontext="Submit"
-      modalOpenButtonText={initialvalues ? editText : addText} 
-      modalTitle="Conteneur"
+      OkButtontext="Sumettre"
+      modalOpenButtonText={initialvalues ? editText : addText}
+      modalTitle="Grade"
       addButtonType="dashed"
       addButtonIcon={
         hasIcon && initialvalues ? <EditOutlined /> : <PlusOutlined />
       }
-      disabledModalOpenButton={disabled || (!initialvalues && !hasPermission('app.add_tc')) || (initialvalues && !hasPermission('app.change_tc'))}
+      disabledModalOpenButton={
+        disabled ||
+        (!initialvalues && !hasPermission("app.add_tc")) ||
+        (initialvalues && !hasPermission("app.change_tc"))
+      }
       onSubmit={handleFormSubmission}
       setOpen={setOpen}
       open={open}
@@ -92,47 +95,32 @@ const AUForm: React.FC<AUFormProps> = ({
       <FormObject form={form} initialvalues={mapInitialValues(initialvalues)}>
         <Row gutter={24}>
           <FormField
-            name="tc"
-            label="Matricule"
+            name="name"
+            label="Nom"
             type="text"
-            required
-            span_md={24}
-          />
-          <FormField name="tar" label="Tar" type="text" required span_md={24} />
-          <FormField
-            name="poids"
-            label="Poids"
-            type="text"
-            required
-            span_md={24}
-          />
-          <FormField
-            name="type_tc"
-            label="Type"
-            type="select"
-            options={containerType?.results}
-            option_label="designation"
             required
             span_md={24}
           />
           <Divider style={{ marginTop: "0px" }} />
+        </Row>
+        <Row gutter={48}>
           <FormField
-            name="dangereux"
-            label="Dangereux"
-            type="select"
-            options={YES_NO_CHOICES}
+            label="Niveau"
+            name="level"
+            type="number"
             required
-            option_value="value"
-            span_md={24}
+            span_md={12}
           />
-          <FormField
-            name="frigo"
-            label="Frigo"
-            type="select"
-            options={YES_NO_CHOICES}
-            option_value="value"
-            span_md={24}
-          />
+          <Form.Item label="Couleur" name="color" required>
+            <ColorPicker value={colorHex} onChange={handleChange} defaultValue="#1677ff"/>
+          </Form.Item>
+        </Row>
+        <Row gutter={24}>
+          <Col span={24}>
+          <Form.Item label="Description" name="description">
+            <TextArea rows={4} />
+          </Form.Item>
+          </Col>
         </Row>
       </FormObject>
     </DraggableModel>

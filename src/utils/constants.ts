@@ -23,6 +23,21 @@ export const YES_NO_CHOICES = [
   }
 ];
 
+export const ORGANIGRAMME_STATES = [
+  {
+    value: "Draft",
+    label: "Brouillon",
+  },
+  {
+    value: "Final",
+    label: "Final",
+  },
+  {
+    value: "Archived",
+    label: "Archivé",
+  }
+];
+
 export const PAIEMENTS_METHODE = [
   {
     value: "Chèque",

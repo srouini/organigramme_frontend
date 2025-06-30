@@ -4,6 +4,8 @@ export const API_GRADES_ENDPOINT = "/api/grades/";
 // Organigrammes
 export const API_ORGANIGRAMMES_ENDPOINT = "/api/organigrams/";
 
+export const API_ORGANIGRAMMES_EDGE_ENDPOINT = "/api/edges/";
+
 // Positions
 export const API_POSITIONS_ENDPOINT = "/api/positions/";
 

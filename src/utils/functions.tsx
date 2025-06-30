@@ -259,12 +259,12 @@ export const processBooleanValue = (value: any): boolean => {
 
 export function getStatusColor(status: string): string {
   switch (status?.toLowerCase()) {
-    case 'Draft':
-      return 'orange';
-    case 'Final':
-      return 'green';
-    case 'Archived':
-      return 'gray';
+    case 'draft':
+      return '#FFA500';
+    case 'final':
+      return '#437057';
+    case 'archived':
+      return '#6C757D';
     default:
       return 'blue';
   }

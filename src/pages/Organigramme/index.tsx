@@ -4,7 +4,7 @@ import useLoading from "@/hooks/useLoading";
 import usePage from "@/hooks/usePage";
 import useFilters from "@/hooks/useFilters";
 import useData from "@/hooks/useData";
-import {  API_ORGANIGRAMMES_ENDPOINT } from "@/api/api";
+import { API_ORGANIGRAMMES_ENDPOINT } from "@/api/api";
 import QueryFilters from "./components/QueryFilters";
 import CustomTable from "@/components/CustomTable";
 import { getMetas } from "./data";
@@ -14,15 +14,14 @@ import { message, Segmented } from "antd";
 import usePost from "@/hooks/usePost";
 import Export from "./components/Export";
 import CustomProList from "@/components/CustomProList";
+import AUForm from "./components/AUForm";
+import { useNavigate } from "react-router-dom";
 
 export default () => {
-
-
   const [search, setSearch] = useState("");
   const { page, getPageSize, setPageSize, setPage } = usePage();
   const { filters, resetFilters, setFilters } = useFilters();
 
- 
   const {
     data,
     isLoading: isLoadingData,
@@ -40,7 +39,7 @@ export default () => {
       ordering: "-id",
     },
   });
-  
+
   const { isLoading } = useLoading({
     loadingStates: [isLoadingData, isRefetching, isFetching],
   });
@@ -70,24 +69,25 @@ export default () => {
     });
   };
 
-  const RowSelectionRnder = (
-    <>
-     
-    </>
-  );
+  const RowSelectionRnder = <></>;
 
+  const navigate = useNavigate();
+  
   return (
     <PageContainer
       contentWidth="Fluid"
       header={{
         title: "Organigrammes",
         extra: [
-          <Export endpoint={API_ORGANIGRAMMES_ENDPOINT} expand="type_tc,current_scelle,article.gros,charge_chargement" key="ALLCONTAINERS" />,
-        ]
-         
+          <Export
+            endpoint={API_ORGANIGRAMMES_ENDPOINT}
+            expand="type_tc,current_scelle,article.gros,charge_chargement"
+            key="ALLCONTAINERS"
+          />,
+          <AUForm refetch={refetch} addText="Organigramme" hasIcon />,
+        ],
       }}
     >
-
       <QueryFilters
         setFilters={setFilters}
         resetFilters={resetFilters}
@@ -98,9 +98,12 @@ export default () => {
         metas={getMetas(refetch)}
         grid={{ gutter: 16, column: 4 }}
         data={data}
+          onItem={(record) => ({
+    onClick: () => navigate(`/organigrammes/${record.id}`),
+    style: { cursor: 'pointer' },
+  })}
         isFetching={isFetching}
-
-         itemLayout="vertical"
+        itemLayout="vertical"
         getPageSize={getPageSize}
         showActions="always"
         isLoading={isLoading}
