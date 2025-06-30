@@ -18,8 +18,7 @@ const formatDate = (field: string, values: any) => {
 
 interface AUFormProps {
   refetch: () => void;
-  initialvalues: any;
-  article: any;
+  initialvalues?: any;
   editText?: string;
   addText?: string;
   hasIcon?: boolean;
@@ -30,7 +29,6 @@ interface AUFormProps {
 const AUForm: React.FC<AUFormProps> = ({
   refetch,
   initialvalues,
-  article,
   editText = "MODIFIER",
   addText = "Mrn",
   hasIcon = false,
@@ -39,10 +37,11 @@ const AUForm: React.FC<AUFormProps> = ({
   const [form] = Form.useForm();
   const [open, setOpen] = useState(false);
 
-  const { containerType } = useReferenceContext();
+  const { grades,organigrams } = useReferenceContext();
 
   useEffect(() => {
-    containerType.fetch();
+    grades.fetch();
+    organigrams.fetch();
   }, []);
 
   const {} = useReferenceContext();
@@ -51,11 +50,8 @@ const AUForm: React.FC<AUFormProps> = ({
     let values = await form.validateFields();
     if (initialvalues) {
       values.id = initialvalues?.id;
-    }else{
-      values.article = parseInt(article);
     }
     
-    values = formatDate("accostage", values);
     mutate(values);
   };
 
@@ -67,7 +63,7 @@ const AUForm: React.FC<AUFormProps> = ({
 
   const { mutate, isLoading } = usePost({
     onSuccess: onSuccess,
-    endpoint: API_CONTENEURS_ENDPOINT,
+    endpoint: API_POSITIONS_ENDPOINT,
   });
 
   const hasPermission = usePermissions();
@@ -91,46 +87,31 @@ const AUForm: React.FC<AUFormProps> = ({
     >
       <FormObject form={form} initialvalues={mapInitialValues(initialvalues)}>
         <Row gutter={24}>
+
+        <FormField
+            name="organigram"
+            label="Organigramme"
+            type="select"
+            options={organigrams?.results}
+            option_label="name"
+            required
+            span_md={24}
+          />
+          <Divider style={{marginTop:"0px"}}/>
           <FormField
-            name="tc"
-            label="Matricule"
+            name="title"
+            label="Title"
             type="text"
             required
             span_md={24}
           />
-          <FormField name="tar" label="Tar" type="text" required span_md={24} />
           <FormField
-            name="poids"
-            label="Poids"
-            type="text"
-            required
-            span_md={24}
-          />
-          <FormField
-            name="type_tc"
-            label="Type"
+            name="grade"
+            label="Grade"
             type="select"
-            options={containerType?.results}
-            option_label="designation"
+            options={grades?.results}
+            option_label="name"
             required
-            span_md={24}
-          />
-          <Divider style={{ marginTop: "0px" }} />
-          <FormField
-            name="dangereux"
-            label="Dangereux"
-            type="select"
-            options={YES_NO_CHOICES}
-            required
-            option_value="value"
-            span_md={24}
-          />
-          <FormField
-            name="frigo"
-            label="Frigo"
-            type="select"
-            options={YES_NO_CHOICES}
-            option_value="value"
             span_md={24}
           />
         </Row>

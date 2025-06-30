@@ -128,3 +128,24 @@ import { BaseModel } from "./commun";
     last_name:string;
     full_name:string;
   }
+
+
+  export interface Grade extends BaseModel {
+    name?: string;
+    level?: string;
+    color?: string;
+    description?: string;
+  }
+
+  export interface Organigram extends BaseModel{
+    name?: string;
+    state?: string;
+  }
+
+  export interface Position extends BaseModel{
+    organigram : Organigram;
+    title: string;
+    grade: number | Grade;  // Foreign key to Grade, can be ID or object
+    position_x?: number;
+    position_y?: number;
+  }

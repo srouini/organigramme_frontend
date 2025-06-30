@@ -13,6 +13,7 @@ import { useReferenceContext } from "@/context/ReferenceContext";
 import { message, Segmented } from "antd";
 import usePost from "@/hooks/usePost";
 import Export from "./components/Export";
+import AUForm from "./components/AUForm";
 
 export default () => {
   const { containerType } = useReferenceContext();
@@ -34,13 +35,13 @@ export default () => {
     refetch,
   } = useData({
     endpoint: API_POSITIONS_ENDPOINT,
-    name: `GET_ALL_CONTAINERS`,
+    name: `GET_ALL_POSITIONS`,
     params: {
       search: search,
       page: page,
       page_size: getPageSize(),
       ...filters,
-      expand: "type_conteneur,nature_conteneur,scelles,article,article.mrn,depotage",
+      expand: "organigram,grade",
       ordering: "-id",
     },
   });
@@ -92,6 +93,7 @@ export default () => {
         title: "Positions",
         extra: [
           <Export endpoint={API_POSITIONS_ENDPOINT} expand="type_tc,current_scelle,article.gros,charge_chargement" key="ALLCONTAINERS" />,
+          <AUForm refetch={refetch} addText="Position" key="ADD_POSITION" hasIcon={true}/>
         ]
          
       }}

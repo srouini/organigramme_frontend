@@ -18,19 +18,19 @@ type QueryFiltersProps = {
   setPage: React.Dispatch<React.SetStateAction<number>>;
   setFilters: React.Dispatch<React.SetStateAction<number>>;
   resetFilters: () => void;
-  collapsed?:boolean
+  collapsed?: boolean
 };
 
 const QueryFilters: React.FC<QueryFiltersProps> = ({
   setFilters,
   resetFilters,
   setPage,
-  collapsed=true
+  collapsed = true
 }) => {
   const handleSubmission = (values: any) => {
     setPage(1);
     setFilters(values);
-   
+
   };
 
 
@@ -41,16 +41,16 @@ const QueryFilters: React.FC<QueryFiltersProps> = ({
         onFinish={handleSubmission}
         onReset={resetFilters}
         style={{ padding: "0px" }}
-       defaultCollapsed={collapsed}
+        defaultCollapsed={collapsed}
       >
         <ProFormText name="matricule__icontains" label="Numéro" />
 
 
 
-      <ProFormDigit name="article__numero" label="Article" />
+        <ProFormDigit name="article__numero" label="Article" />
 
 
-     
+
 
 
 
@@ -77,7 +77,7 @@ const QueryFilters: React.FC<QueryFiltersProps> = ({
 
 
 
-<ProFormSelect
+        <ProFormSelect
           {...selectConfig}
           // @ts-ignore
           options={YES_NO_CHOICES}
@@ -86,7 +86,7 @@ const QueryFilters: React.FC<QueryFiltersProps> = ({
           mode="single"
         />
 
-<ProFormSelect
+        <ProFormSelect
           {...selectConfig}
           // @ts-ignore
           options={YES_NO_CHOICES}

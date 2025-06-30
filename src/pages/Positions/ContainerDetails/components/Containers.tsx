@@ -1,4 +1,4 @@
-import { API_CONTENEURS_ENDPOINT, API_SET_BULLETIN__ENDPOINT } from "@/api/api";
+import { API_POSITIONS_ENDPOINT } from "@/api/api";
 import CustomTable from "@/components/CustomTable";
 import useData from "@/hooks/useData";
 import useLoading from "@/hooks/useLoading";
@@ -50,7 +50,7 @@ export default ({
     isFetching,
     refetch,
   } = useData({
-    endpoint: API_CONTENEURS_ENDPOINT,
+    endpoint: API_POSITIONS_ENDPOINT,
     name: "GET_CONTAINERS",
     params: {
       search: search,
@@ -130,7 +130,7 @@ export default ({
 
   const { mutate, isLoading: isPosting } = usePost({
     onSuccess: onSuccess,
-    endpoint: API_SET_BULLETIN__ENDPOINT,
+    endpoint: API_POSITIONS_ENDPOINT,
   });
 
   const handleLoadingContainers = () => {

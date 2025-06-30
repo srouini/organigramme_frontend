@@ -13,134 +13,33 @@ export const getColumns = (
   refetch: () => void,
 ): ProColumns<any>[] => [
     {
-      title: "Matricule",
-      dataIndex: "matricule",
+      title: "Organigramme",
+      dataIndex: "organigram",
       key: "1",
       width: 100,
+      render: (record:any) => renderText(record?.name)
     },
     {
-      title: "Type",
+      title: "Title",
       key: "2",
-      dataIndex: "type_conteneur",
+      dataIndex: "title",
       width: 150,
-      render: (record: any) => <Tag color={record?.couleur ? record?.couleur : "blue"}> {record?.designation} </Tag>,
     },
     {
-      title: "Nature",
+      title: "Grade",
       key: "3",
-      dataIndex: "nature_conteneur",
+      dataIndex: "grade",
       width: 150,
-      render: (record: any) => <Tag color={record?.couleur ? record?.couleur : "blue"}> {record?.designation} </Tag>,
+      render: (record: any) => <Tag color={record?.color ? record?.color : "blue"}> {record?.name} </Tag>,
     },
     {
-      title: "Mrn",
-      key: "mrn",
-      dataIndex: "article",
+      title: "Crée le",
+      key: "5",
+      dataIndex: "created_at",
       width: 250,
-      render: (record: any) => renderText(record?.mrn?.numero_mrn),
+      render: (record: any) => renderDateTime(record?.created_at),
     },
-    {
-      title: "Accostage",
-      key: "mrn",
-      dataIndex: "article",
-      width: 150,
-      render: (record: any) => renderText(record?.mrn?.date_accostage),
-    },
-    {
-      title: "Article",
-      key: "article",
-      dataIndex: "article",
-      width: 100,
-      render: (record: any) => renderText(record?.numero),
-    },
-    {
-      title: "Groupage",
-      key: "groupage",
-      dataIndex: "article",
-      width: 150,
-      render: (record: any) =>
-        record?.groupage ? <Tag color="blue"> Groupage </Tag> : <Tag> Ordinaire </Tag>,
-    }
-    ,
-    {
-      title: "Scelles",
-      dataIndex: "scelles",
-      key: "scelles",
-      width: 150,
-      render: (record: any) => record?.length > 0 ? <Popover placement="topLeft" title={null} content={<div>{record?.map((scelle: any) => <div><Tag key={scelle?.id} color="cyan">{scelle?.numero}</Tag> <Tag> {scelle?.type}  </Tag> {scelle?.date}</div>)}</div>}> <SafetyCertificateOutlined style={{ color: "green" }} /></Popover> : "-"
-    },
-    {
-      title: "Depoté",
-      key: "7",
-      width: 150,
-      dataIndex: "depotage",
-      render: (_, record: any) => {
-        if (record.depotage === null) {
-          // Not depoted yet
-          return record.groupage ? <Tag color="red">Non depoté</Tag> : "-";
-        } else {
-          // Depoted - format the date nicely
-          const date = new Date(record?.depotage?.date_depotage);
-          const formattedDate = date.toLocaleDateString();
-          const hasObservation = record?.depotage?.observation_depotage &&
-            record.depotage.observation_depotage.trim() !== '';
-
-          // If there is an observation, wrap the tag in a tooltip
-          if (hasObservation) {
-            return (
-              <Tooltip
-                title={record.depotage.observation_depotage}
-                placement="top"
-              >
-                <Tag color="green">Depoté le {formattedDate}</Tag>
-              </Tooltip>
-            );
-          } else {
-            return <Tag color="green">Depoté le {formattedDate}</Tag>;
-          }
-        }
-      }
-    }
-    ,
-
-    {
-      title: "Tar",
-      key: "3",
-      dataIndex: "tar",
-      width: 150,
-    },
-    {
-      title: "Poids",
-      key: "4",
-      dataIndex: "poids",
-      width: 120,
-    },
-    {
-      title: "Date livraison",
-      key: "date_laivrison",
-      dataIndex: "date_laivrison",
-      width: 220,
-      render: (record: any) => renderDateTime(record),
-    },
-    {
-      title: "Date reception",
-      key: "date_reception",
-      dataIndex: "date_reception",
-      width: 220,
-      render: (record: any) => renderDateTime(record),
-    },
-    {
-      title: "Statut facturation",
-      key: "billed",
-      dataIndex: "billed",
-      width: 200,
-      render: (record: any) => (
-        <Tag color={record ? "green" : "red"}>
-          {record ? "Facturé" : "Non facturé"}
-        </Tag>
-      ),
-    },
-
+  
     {
       title: "Actions",
       valueType: "option",
