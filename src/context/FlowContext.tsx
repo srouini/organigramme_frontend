@@ -1,5 +1,18 @@
-import React, { createContext, useCallback, useContext, useMemo, useState } from 'react'
-import { Node, Edge, Connection, addEdge, applyEdgeChanges, applyNodeChanges } from '@xyflow/react'
+import React, {
+  createContext,
+  useCallback,
+  useContext,
+  useMemo,
+  useState,
+} from 'react'
+import {
+  Node,
+  Edge,
+  Connection,
+  addEdge,
+  applyEdgeChanges,
+  applyNodeChanges,
+} from '@xyflow/react'
 
 /** ---------- types ---------- */
 export type FlowCtx = {
@@ -10,6 +23,8 @@ export type FlowCtx = {
   onEdgesChange: ReturnType<typeof createEdgesChangeHandler>
   onConnect: (c: Connection) => void
   updateNode: (id: string, pos: { x: number; y: number }) => void
+  toggleCollapse: (id: string) => void
+  isCollapsed: (id: string) => boolean
 }
 
 const noop = () => {}
@@ -21,12 +36,14 @@ const FlowContext = createContext<FlowCtx>({
   onEdgesChange: noop,
   onConnect: noop,
   updateNode: noop,
+  toggleCollapse: noop,
+  isCollapsed: () => false,
 })
 
 /** ---------- helpers ---------- */
 function createNodesChangeHandler(
   setNodes: React.Dispatch<React.SetStateAction<Node[]>>,
-  edges: Edge[],
+  _edges: Edge[],
 ) {
   return (changes: Parameters<typeof applyNodeChanges>[0]) =>
     setNodes((nds) => applyNodeChanges(changes, nds))
@@ -34,18 +51,41 @@ function createNodesChangeHandler(
 
 function createEdgesChangeHandler(
   setEdges: React.Dispatch<React.SetStateAction<Edge[]>>,
-  nodes: Node[],
+  _nodes: Node[],
 ) {
   return (changes: Parameters<typeof applyEdgeChanges>[0]) =>
     setEdges((eds) => applyEdgeChanges(changes, eds))
+}
+
+function getDescendants(rootId: string, edges: Edge[]): string[] {
+  const map = new Map<string, string[]>()
+  edges.forEach((e) => {
+    map.set(e.source, (map.get(e.source) || []).concat(e.target))
+  })
+
+  const visited = new Set<string>()
+  const queue = [rootId]
+
+  while (queue.length) {
+    const current = queue.shift()!
+    const children = map.get(current) || []
+    for (const child of children) {
+      if (!visited.has(child)) {
+        visited.add(child)
+        queue.push(child)
+      }
+    }
+  }
+
+  return Array.from(visited)
 }
 
 /** ---------- provider ---------- */
 export const FlowProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [nodes, setNodes] = useState<Node[]>([])
   const [edges, setEdges] = useState<Edge[]>([])
+  const [collapsed, setCollapsed] = useState<Set<string>>(new Set())
 
-  /** central API—mirrors the Zustand version */
   const setGraph = useCallback((nds: Node[], eds: Edge[]) => {
     setNodes(nds)
     setEdges(eds)
@@ -65,6 +105,38 @@ export const FlowProvider: React.FC<{ children: React.ReactNode }> = ({ children
     )
   }, [])
 
+  const toggleCollapse = useCallback((id: string) => {
+    setCollapsed((prev) => {
+      const next = new Set(prev)
+      if (next.has(id)) {
+        next.delete(id)
+      } else {
+        next.add(id)
+      }
+
+      setNodes((nds) => {
+        const descIds = getDescendants(id, edges)
+        const hide = !prev.has(id)
+        return nds.map((n) =>
+          descIds.includes(n.id) ? { ...n, hidden: hide } : n
+        )
+      })
+
+      setEdges((eds) => {
+        const descIds = getDescendants(id, edges)
+        return eds.map((e) =>
+          descIds.includes(e.source) || descIds.includes(e.target)
+            ? { ...e, hidden: !prev.has(id) }
+            : e
+        )
+      })
+
+      return next
+    })
+  }, [edges])
+
+  const isCollapsed = useCallback((id: string) => collapsed.has(id), [collapsed])
+
   const value: FlowCtx = {
     nodes,
     edges,
@@ -73,6 +145,8 @@ export const FlowProvider: React.FC<{ children: React.ReactNode }> = ({ children
     onEdgesChange,
     onConnect,
     updateNode,
+    toggleCollapse,
+    isCollapsed,
   }
 
   return <FlowContext.Provider value={value}>{children}</FlowContext.Provider>

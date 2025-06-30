@@ -8,6 +8,7 @@ import Delete from "@/components/Delete";
 import AUForm from "./components/AUForm";
 import Print from "@/components/Print";
 import { SafetyCertificateOutlined } from "@ant-design/icons";
+import DetailsButton from "@/components/DetailsButton";
 
 export const getColumns = (
   refetch: () => void,
@@ -24,6 +25,7 @@ export const getColumns = (
       key: "2",
       dataIndex: "title",
       width: 150,
+      render: (_,record: any) => <DetailsButton text={`${record?.title}`} navigate_to={`Positions/${record?.id}`} />,
     },
     {
       title: "Grade",

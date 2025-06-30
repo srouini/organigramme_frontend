@@ -4,7 +4,7 @@ import { Container } from "@/types/data";
 import { ProDescriptions } from "@ant-design/pro-components";
 import CustomTable from "@/components/CustomTable";
 import useData from "@/hooks/useData";
-import { API_SOUSARTICLES_ENDPOINT } from "@/api/api";
+import { API_TASKS_ENDPOINT } from "@/api/api";
 import usePage from "@/hooks/usePage";
 import { getColumns } from "./data";
 import useLoading from "@/hooks/useLoading";
@@ -14,19 +14,20 @@ import { TableSelectionType } from "@/types/antdeing";
 import { useReferenceContext } from "@/context/ReferenceContext";
 import Export from "./components/Export";
 import { selectConfig } from "@/utils/config";
+import { Position } from "@/types/data";
 
-interface SubArticlePageProps {
-  container: Container;
-  columns: any;
+interface PageProps {
+  position: Position;
 }
 
-export default ({ container, columns }: SubArticlePageProps) => {
+export default ({ position }: PageProps) => {
   const [open, setOpen] = useState(false);
 
   const { box } = useReferenceContext();
   useEffect(() => {
     box?.fetch();
   }, []);
+
   const showDrawer = () => {
     setOpen(true);
   };
@@ -45,14 +46,14 @@ export default ({ container, columns }: SubArticlePageProps) => {
     isFetching,
     refetch,
   } = useData({
-    endpoint: API_SOUSARTICLES_ENDPOINT,
-    name: `GET_SOUS_ARTICLES_${container?.id}`,
+    endpoint: API_TASKS_ENDPOINT,
+    name: `GET_TASKS_${position?.id}`,
     params: {
       search: search,
       page: page,
       page_size: getPageSize(),
       expand: "client,transitaire,box",
-      tc__id: container?.id,
+      position__id: position?.id,
     },
   });
 
@@ -75,7 +76,7 @@ export default ({ container, columns }: SubArticlePageProps) => {
 
   const { mutate } = usePost({
     onSuccess: onSuccess,
-    endpoint: API_SOUSARTICLES_ENDPOINT + "bulk_update_box/",
+    endpoint: API_TASKS_ENDPOINT + "bulk_update_position/",
   });
 
   const handleContainerType = (values: any) => {
@@ -108,7 +109,7 @@ export default ({ container, columns }: SubArticlePageProps) => {
 
   return (
     <>
-      <Button onClick={showDrawer}>{container?.matricule}</Button>
+      <Button onClick={showDrawer}>{position?.}</Button>
 
       <Drawer
         width={1000}
@@ -121,10 +122,10 @@ export default ({ container, columns }: SubArticlePageProps) => {
           className="site-description-item-profile-p"
           style={{ marginBottom: 24, fontWeight: "bold" }}
         >
-          {container?.matricule}
+          {position?.title}
         </p>
         <ProDescriptions
-          dataSource={container}
+          dataSource={position}
           columns={columns}
           style={{ marginBottom: "10px", maxHeight: "50" }}
         ></ProDescriptions>

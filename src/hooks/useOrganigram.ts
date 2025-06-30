@@ -19,6 +19,7 @@ export interface Position {
 }
 
 export interface Edge {
+  id: string
   source: string
   target: string
   edge_type?: string
@@ -126,6 +127,17 @@ export const useCreateEdge = () => {
     onSuccess: (_, variables) => {
       qc.invalidateQueries({ queryKey: ['organigram', variables.organigram] })
     },
+  })
+}
+
+/* ------------------------------------------------------------------
+   Hook: delete an OrganigramEdge
+   ------------------------------------------------------------------ */
+export const useDeleteEdge = () => {
+  const axios = useAxios()
+
+  return useMutation<unknown, Error, { edgeId: string; organigramId: string }>({
+    mutationFn: ({ edgeId }) => axios.delete(`${API_ORGANIGRAMMES_EDGE_ENDPOINT}${edgeId}/`),
   })
 }
 

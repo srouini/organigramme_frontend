@@ -2,7 +2,7 @@ import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react-swc'
 import path from 'path';
 import { VitePWA } from 'vite-plugin-pwa';
-import fs from 'fs';
+import tailwindcss from "@tailwindcss/vite"
 
 // https://vitejs.dev/config/
 export default defineConfig({
@@ -10,7 +10,8 @@ export default defineConfig({
     // Configure proper MIME types for service worker and manifest
     middlewareMode: false,
   },
-  plugins: [react()
+  plugins: [react(),
+    tailwindcss()
     ,
     VitePWA({
       // Enable PWA in development mode
@@ -37,7 +38,9 @@ export default defineConfig({
             sizes: '512x512',
             type: 'image/png',
           },
+          
         ],
+      
       },
       workbox: {
         maximumFileSizeToCacheInBytes: 6 * 1024 * 1024, // 6 MB

@@ -11,7 +11,6 @@ import GradesPage from './pages/Grades/index';
 import PositionsPage from './pages/Positions/index';
 import OrganigrammesPage from './pages/Organigramme/index';
 import OrganigrammesDetailsPage from './pages/Organigramme/OrganigramDetails/index';
-
 const App = () => {
   return (
     <ConfigProvider

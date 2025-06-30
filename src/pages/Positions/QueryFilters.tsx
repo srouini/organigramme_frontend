@@ -34,6 +34,13 @@ const QueryFilters: React.FC<QueryFiltersProps> = ({
   };
 
 
+
+  const { grades } = useReferenceContext();
+
+  useEffect(() => {
+    grades.fetch();
+  }, []);
+
   return (
     <Card style={{ marginBottom: "20px" }}>
       <QueryFilter
@@ -46,43 +53,12 @@ const QueryFilters: React.FC<QueryFiltersProps> = ({
         <ProFormText name="matricule__icontains" label="Numéro" />
 
 
-
-      <ProFormDigit name="article__numero" label="Article" />
-
-
-     
-
-
-
-        <ProFormDatePicker name="article__mrn__date_accostage" label="Accostage" />
-        <ProFormDateRangePicker
-          name="article__mrn__date_accostage__range"
-          label="Accostage"
-          transform={(value) => transformRangeDateFilter("article__mrn__date_accostage", value)}
-        />
-
-        <ProFormDatePicker name="date_laivrison__date" label="Date livraison" />
-        <ProFormDateRangePicker
-          name="date_laivrison__date__range"
-          label="Date livraison"
-          transform={(value) => transformRangeDateFilter("date_laivrison__date", value)}
-        />
-
-        <ProFormDatePicker name="date_reception__date" label="Date réception" />
-        <ProFormDateRangePicker
-          name="date_reception__date__range"
-          label="Date réception"
-          transform={(value) => transformRangeDateFilter("date_reception__date", value)}
-        />
-
-
-
 <ProFormSelect
           {...selectConfig}
           // @ts-ignore
-          options={YES_NO_CHOICES}
-          label="Facturé"
-          name="billed"
+          options={grades?.results}
+          label="Grade"
+          name="grade__icontains"
           mode="single"
         />
 
