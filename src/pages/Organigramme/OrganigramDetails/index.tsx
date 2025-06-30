@@ -120,6 +120,7 @@ export default () => {
           onEdgesChange={onEdgesChange}
           onConnect={onConnect}
           onNodeDragStop={onDragStop}
+          fitView={true}
         >
           <Background />
           <Controls />
