@@ -2,7 +2,7 @@ import { PageContainer } from "@ant-design/pro-components";
 
 import { API_ORGANIGRAMMES_ENDPOINT } from "@/api/api";
 import type { Connection } from 'reactflow';
-import { addEdge } from 'reactflow';
+import { addEdge, MarkerType } from 'reactflow';
 import CustomButtonEdge from "@/components/ButtonEdge";
 import Export from "./components/Export";
 import { useCreateEdge } from '@/hooks/useOrganigram' 
@@ -18,6 +18,9 @@ import {
 import { useFlow } from "@/context/FlowContext";
 import { useEffect, useCallback } from "react";
 import { ZoomSlider } from "@/components/zoom-slider";
+import CustomNode from "@/components/CustomNode";
+import FloatingEdge from '@/components/FloatingEdge';
+import CustomConnectionLine from '@/components/CustomConnectionLine';
 
 export default () => {
   const { id } = useParams<{ id: string }>();
@@ -70,6 +73,14 @@ export default () => {
   };
 
   
+  const nodeTypes = {
+    custom: CustomNode,
+  };
+  
+  const connectionLineStyle = {
+    stroke: '#b1b1b7',
+  };
+
   const onConnect = useCallback(
   (conn: Connection) => {
     createEdge(
@@ -96,6 +107,14 @@ export default () => {
   [createEdge, id, nodes, edges, setGraph],
 )
 const { toggleCollapse } = useFlow()
+
+const defaultEdgeOptions = {
+  type: 'floating',
+  markerEnd: {
+    type: MarkerType.ArrowClosed,
+    color: '#b1b1b7',
+  },
+};
 
   return (
     <PageContainer
@@ -133,6 +152,10 @@ const { toggleCollapse } = useFlow()
           onNodeDragStop={onDragStop}
           fitView={true}
           onNodeDoubleClick={(e, node) => toggleCollapse(node.id)}
+          nodeTypes={nodeTypes}
+          defaultEdgeOptions={defaultEdgeOptions}
+          connectionLineComponent={CustomConnectionLine}
+          connectionLineStyle={connectionLineStyle}
         >
           <Background />
           <Controls />

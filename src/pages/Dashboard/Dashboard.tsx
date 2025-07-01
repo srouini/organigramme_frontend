@@ -44,7 +44,8 @@ export default () => {
         </div>
         <div style={{ marginBottom: "25px" }}>
           <Text type="secondary" style={{ marginBottom: "30px", fontSize: "20px" }}>
-            Bienvenue sur votre espace de gestion des opérations
+          Bienvenue dans votre espace de gestion organisationnelle
+
           </Text>
         </div>
         <div style={{

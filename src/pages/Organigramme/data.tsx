@@ -115,7 +115,7 @@ export const getColumns = (
                   url={API_ORGANIGRAMMES_ENDPOINT}
                   id={record?.id}
                   refetch={refetch}
-                  class_name="Conteneur"
+                  class_name="Organigramme"
                   type="dashed"
                   link={false}
                   text=""
@@ -127,7 +127,6 @@ export const getColumns = (
                 <AUForm
                   initialvalues={record}
                   refetch={refetch}
-                  article={record?.article}
                   editText=""
                   hasIcon
                 />

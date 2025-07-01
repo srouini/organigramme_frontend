@@ -57,8 +57,8 @@ const LoginPage: React.FC = () => {
       }}
     >
 <div style={{ width:"350px"}}>
-      <div style={{ textAlign: "left", outline: "none", position: "absolute", top: "20px", left: "20px" }}>
-        <img src="/logo_white.png" style={{ outline: "none" }} alt="Logo" width={150} />
+      <div style={{ textAlign: "left", outline: "none", position: "absolute", top: "40px", left: "40px" }}>
+        <img src="/organigramme.png" style={{ outline: "none" }} alt="Logo" width={70} />
       </div>
 
       <Row style={{ marginBottom: "10px", display: "flex", justifyContent:"left" }}>
@@ -69,12 +69,12 @@ const LoginPage: React.FC = () => {
 
       <Row style={{ marginBottom: "10px", display: "flex", justifyContent:"left" }}>
         <div style={{ textAlign: "left", outline: "none", fontSize:"11pt", fontWeight:"light" }}>
-          Welcome to <b style={{color:"#968b6a" }}>LOGIFLOW</b>,
+          Welcome to <b style={{color:"#968b6a" }}>Organigramme</b>,
         </div>
       </Row>
       <Row style={{ marginBottom: "40px", display: "flex", justifyContent:"left" }}>
         <div style={{ textAlign: "left", outline: "none", fontSize:"11pt", fontWeight:"light" }}>
-          management made easy.
+          Organigrammes made easy.
         </div>
       </Row>
       <Row style={{ width: "100%", maxWidth: "350px" }}>

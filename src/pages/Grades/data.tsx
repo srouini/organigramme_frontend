@@ -14,7 +14,7 @@ export const getColumns = (
       title: "Titre",
       dataIndex: "name",
       key: "1",
-      render: (_,record: any) => <><Badge color={record?.color} style={{marginRight:"5px"}}/> {record?.name}</>
+      render: (_,record: any) => <><Badge color={record?.color} style={{ marginRight:"5px"}}/> {record?.name}</>
     },
     {
       title: "Niveau",
@@ -22,7 +22,12 @@ export const getColumns = (
       dataIndex: "level",
       render: (_,record: any) => <Tag color={record?.color ? record?.color : "blue"}> {record?.level} </Tag>,
     },
-
+    {
+      title: "Categorie",
+      key: "34",
+      dataIndex: "category",
+      render: (record: any) => <Tag>{record}</Tag>
+    },
     {
       title: "Description",
       key: "mrn",
@@ -46,7 +51,7 @@ export const getColumns = (
                   url={API_GRADES_ENDPOINT}
                   id={record?.id}
                   refetch={refetch}
-                  class_name="Conteneur"
+                  class_name="Grade"
                   type="dashed"
                   link={false}
                   text=""

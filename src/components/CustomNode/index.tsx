@@ -1,62 +1,15 @@
-import { memo } from 'react';
-import { Handle, Position, NodeProps } from '@xyflow/react';
-import { Avatar, Typography } from 'antd';
-import { UserOutlined } from '@ant-design/icons';
-import './styles.css';
-
-const { Text } = Typography;
-
-// Define the shape of our custom node data
-type NodeData = {
-  label: string;
-  grade?: string;
-  avatar?: string;
-};
-
-// Export the type for use in other components
-export type CustomNodeData = NodeData;
-
-// Props for our custom node component
-type CustomNodeProps = {
-  data: NodeData;
-  selected?: boolean;
-  style?: React.CSSProperties;
-};
-
-const CustomNode = ({
-  data,
-  selected = false,
-  style,
-}: CustomNodeProps) => {
-  // Ensure we have data and provide defaults
-  const nodeData = data || { label: 'Unnamed' };
-  
+import { Handle, Position, useConnection } from '@xyflow/react';
+ 
+export default function CustomNode({ id }: { id: string }) {
+  const connection = useConnection(); 
+ 
+  const isTarget = connection.inProgress && connection.fromNode.id !== id;
+ 
+  const label = isTarget ? 'Drop here' : 'Drag to connect';
+ 
   return (
-    <div 
-      className={`custom-node ${selected ? 'selected' : ''}`}
-      style={style}
-    >
-      <div className="node-content">
-        <div className="avatar-container">
-          {nodeData.avatar ? (
-            <Avatar size="large" src={nodeData.avatar} />
-          ) : (
-            <Avatar size="large" icon={<UserOutlined />} />
-          )}
-          {nodeData.grade && (
-            <Text type="secondary" className="grade">
-              {nodeData.grade}
-            </Text>
-          )}
-        </div>
-        <div className="label">
-          <Text strong>{nodeData.label}</Text>
-        </div>
-      </div>
-      <Handle type="target" position={Position.Top} />
-      <Handle type="source" position={Position.Bottom} />
+    <div className="customNode" style={{ backgroundColor: "#000" }}>
+ 
     </div>
   );
-};
-
-export default memo(CustomNode);
+}

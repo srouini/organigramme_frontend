@@ -67,7 +67,7 @@ const Delete: React.FC<DeleteProps> = ({
 
   return (
     <Popconfirm
-      title="Vous allez supprimer cet enregistrement, êtes-vous sûr ?"
+      title="Êtes-vous sûr de vouloir supprimer cet enregistrement ??"
       onConfirm={confirm}
       key={id}
       disabled={disabled ||verifyPermission}

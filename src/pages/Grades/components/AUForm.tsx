@@ -38,13 +38,12 @@ const AUForm: React.FC<AUFormProps> = ({
 }) => {
   const [form] = Form.useForm();
   const [open, setOpen] = useState(false);
+  const {grades} = useReferenceContext();
 
   const [colorHex, setColorHex] = useState<string>('#1677ff');
 
    const handleChange = (color: Color) => {
     const hex = color.toHexString(); // get color in hex
-    setColorHex(hex);
-    console.log('Selected Color:', hex);
   };
 
   const handleFormSubmission = async () => {
@@ -59,9 +58,10 @@ const AUForm: React.FC<AUFormProps> = ({
   };
 
   const onSuccess = () => {
-    message.success("Submission successful");
+    message.success("Le grade a été créé avec succès");
     setOpen(false);
     refetch();
+    grades?.refetch();
   };
 
   const { mutate, isLoading } = usePost({
@@ -103,18 +103,26 @@ const AUForm: React.FC<AUFormProps> = ({
           />
           <Divider style={{ marginTop: "0px" }} />
         </Row>
-        <Row gutter={48}>
+      
+   
           <FormField
             label="Niveau"
             name="level"
             type="number"
             required
-            span_md={12}
+            span_md={24}
+          />
+               <FormField
+            name="category"
+            label="Categorie"
+            type="text"
+            required
+            span_md={24}
           />
           <Form.Item label="Couleur" name="color" required>
             <ColorPicker value={colorHex} onChange={handleChange} defaultValue="#1677ff"/>
           </Form.Item>
-        </Row>
+   
         <Row gutter={24}>
           <Col span={24}>
           <Form.Item label="Description" name="description">

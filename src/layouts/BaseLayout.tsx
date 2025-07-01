@@ -343,7 +343,7 @@ export default () => {
               const defaultDom = (
                 <Row align="middle" justify="center" gutter={12}>
                   <Col style={{ display: "flex", alignItems: "center" }}>
-                    <img src="/logo_white.png" width={80} alt="Logo" />
+                    <img src="/organigramme.png" width={30} alt="Logo" />
                   </Col>
                 </Row>
               );

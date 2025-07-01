@@ -17,11 +17,12 @@ import CustomProList from "@/components/CustomProList";
 import AUForm from "./components/AUForm";
 import { useNavigate } from "react-router-dom";
 
-
 export default () => {
   const [search, setSearch] = useState("");
   const { page, getPageSize, setPageSize, setPage } = usePage();
   const { filters, resetFilters, setFilters } = useFilters();
+
+
 
   const {
     data,
@@ -73,7 +74,7 @@ export default () => {
   const RowSelectionRnder = <></>;
 
   const navigate = useNavigate();
-  
+
   return (
     <PageContainer
       contentWidth="Fluid"
@@ -86,7 +87,7 @@ export default () => {
             key="ALLCONTAINERS"
           />,
           <AUForm refetch={refetch} addText="Organigramme" hasIcon />,
-  
+
         ],
       }}
     >
@@ -100,10 +101,10 @@ export default () => {
         metas={getMetas(refetch)}
         grid={{ gutter: 16, column: 4 }}
         data={data}
-          onItem={(record) => ({
-    onClick: () => navigate(`/organigrammes/${record.id}`),
-    style: { cursor: 'pointer' },
-  })}
+        onItem={(record) => ({
+          onClick: () => navigate(`/organigrammes/${record.id}`),
+          style: { cursor: 'pointer' },
+        })}
         isFetching={isFetching}
         itemLayout="vertical"
         getPageSize={getPageSize}

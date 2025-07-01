@@ -10,6 +10,7 @@ import FormField from "@/components/form/FormField";
 import { YES_NO_CHOICES } from "@/utils/constants";
 import { EditOutlined, PlusOutlined } from "@ant-design/icons";
 import { usePermissions } from "@/utils/permissions";
+import TextArea from "antd/es/input/TextArea";
 
 const formatDate = (field: string, values: any) => {
   if (values[field]) values[field] = values[field].format("YYYY-MM-DD");
@@ -111,6 +112,33 @@ const AUForm: React.FC<AUFormProps> = ({
             type="select"
             options={grades?.results}
             option_label="name"
+            required
+            span_md={24}
+          />
+          <Divider style={{marginTop:"0px"}}/>
+
+              <Form.Item label="Mission Principale" name="mission_principal" required style={{ width: '100%' }}>
+                      <TextArea rows={4} />
+                    </Form.Item>
+                    
+          <FormField
+            name="formation"
+            label="Formation"
+            type="text"
+            required
+            span_md={24}
+          />
+          <FormField
+            name="experience"
+            label="Expérience"
+            type="text"
+            required
+            span_md={24}
+          />
+          <FormField
+            name="quantity"
+            label="Quantité"
+            type="number"
             required
             span_md={24}
           />

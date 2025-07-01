@@ -12,6 +12,14 @@ export const API_POSITIONS_ENDPOINT = "/api/positions/";
 // Edges
 export const API_EDGES_ENDPOINT = "/api/edges/";
 
+// Tasks
+export const API_TASKS_ENDPOINT = "/api/tasks/";
+
+// Competences
+export const API_COMPETENCES_ENDPOINT = "/api/competences/";
+
+// Missions
+export const API_MISSIONS_ENDPOINT = "/api/missions/";
 
 // AUTH
 

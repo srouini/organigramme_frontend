@@ -1,20 +1,24 @@
-import { useEffect, useState } from "react";
-import { Button, Divider, Drawer, message, Select } from "antd";
-import { Container } from "@/types/data";
-import { ProDescriptions } from "@ant-design/pro-components";
+import { useState } from "react";
+import { Button, Divider, Drawer, Flex, List, Row, Skeleton, Tag, Typography } from "antd";
 import CustomTable from "@/components/CustomTable";
 import useData from "@/hooks/useData";
-import { API_TASKS_ENDPOINT } from "@/api/api";
+import { API_TASKS_ENDPOINT, API_COMPETENCES_ENDPOINT, API_MISSIONS_ENDPOINT, API_POSITIONS_ENDPOINT } from "@/api/api";
 import usePage from "@/hooks/usePage";
-import { getColumns } from "./data";
 import useLoading from "@/hooks/useLoading";
-import AUForm from "./components/AUForm";
-import usePost from "@/hooks/usePost";
 import { TableSelectionType } from "@/types/antdeing";
-import { useReferenceContext } from "@/context/ReferenceContext";
-import Export from "./components/Export";
-import { selectConfig } from "@/utils/config";
-import { Position } from "@/types/data";
+import { Competence, Mission, Position, Task } from "@/types/reference";
+import Delete from "@/components/Delete";
+import AddCompetenceForm from "./components/AddCompetenceForm";
+import AddMissionForm from "./components/AddMissionForm";
+import UpdateMissionForm from "./components/UpdateMissionForm";
+import UpdateCompetenceForm from "./components/UpdateCompetenceForm";
+import DownloadMissionTemplate from "./components/DownloadMissionTemplate";
+import UploadMissions from "./components/UploadMissions";
+import DownloadCompetenceTemplate from "./components/DownloadCompetenceTemplate";
+import UploadCompetences from "./components/UploadCompetences";
+import Print from "@/components/Print";
+
+const { Title } = Typography;
 
 interface PageProps {
   position: Position;
@@ -23,10 +27,6 @@ interface PageProps {
 export default ({ position }: PageProps) => {
   const [open, setOpen] = useState(false);
 
-  const { box } = useReferenceContext();
-  useEffect(() => {
-    box?.fetch();
-  }, []);
 
   const showDrawer = () => {
     setOpen(true);
@@ -36,80 +36,43 @@ export default ({ position }: PageProps) => {
     setOpen(false);
   };
 
-  const [search, setSearch] = useState("");
-  const { page, getPageSize, setPageSize, setPage } = usePage();
-
   const {
-    data,
-    isLoading: isLoadingData,
-    isRefetching,
-    isFetching,
-    refetch,
+    data: missions,
+    isLoading: isLoadingMissions,
+    isRefetching: isRefetchingMissions,
+    isFetching: isFetchingMissions,
+    refetch: refetchMissions,
   } = useData({
-    endpoint: API_TASKS_ENDPOINT,
-    name: `GET_TASKS_${position?.id}`,
+    endpoint: API_MISSIONS_ENDPOINT,
+    name: `GET_MISSIONS_${position?.id}`,
     params: {
-      search: search,
-      page: page,
-      page_size: getPageSize(),
-      expand: "client,transitaire,box",
+      all: true,
       position__id: position?.id,
     },
   });
 
-  const { isLoading } = useLoading({
-    loadingStates: [isLoadingData, isRefetching, isFetching],
-  });
-
-  const [selectedRows, setSelectedRows] = useState<React.Key[]>([]);
-  const rowSelectionFunction: TableSelectionType = {
-    // @ts-ignore
-    onChange(selectedRowKeys, selectedRows, info) {
-      setSelectedRows(selectedRowKeys);
+  console.log(missions)
+  const {
+    data: competences,
+    isLoading: isLoadingCompetences,
+    isRefetching: isRefetchingCompetences,
+    isFetching: isFetchingCompetences,
+    refetch: refetchCompetences,
+  } = useData({
+    endpoint: API_COMPETENCES_ENDPOINT,
+    name: `GET_COMPETENCES_${position?.id}`,
+    params: {
+      all: true,
+      position__id: position?.id,
     },
-  };
-
-  const onSuccess = () => {
-    message.success("Submission successful");
-    refetch();
-  };
-
-  const { mutate } = usePost({
-    onSuccess: onSuccess,
-    endpoint: API_TASKS_ENDPOINT + "bulk_update_position/",
   });
-
-  const handleContainerType = (values: any) => {
-    mutate({
-      ids: selectedRows,
-      box_id: values,
-    });
-  };
-
-  const RowSelectionRnder = (
-    <>
-      Type:
-      <Select
-      style={{ width: "300px", marginBottom: "0px", paddingBottom: "0px" }}
-      
-      {...selectConfig}
-
-      onChange={handleContainerType}
-      options={box?.results}
-
-      fieldNames={{
-        label: "designation",
-        value: "id",
-      }}
-
-
-    />
-    </>
-  );
+  const { isLoading } = useLoading({
+    loadingStates: [isLoadingMissions, isRefetchingMissions, isFetchingMissions],
+  });
 
   return (
     <>
-      <Button onClick={showDrawer}>{position?.}</Button>
+      <Button onClick={showDrawer} type="link">{position?.title}</Button>
 
       <Drawer
         width={1000}
@@ -118,40 +81,116 @@ export default ({ position }: PageProps) => {
         onClose={onClose}
         open={open}
       >
-        <p
-          className="site-description-item-profile-p"
-          style={{ marginBottom: 24, fontWeight: "bold" }}
-        >
-          {position?.title}
-        </p>
-        <ProDescriptions
-          dataSource={position}
-          columns={columns}
-          style={{ marginBottom: "10px", maxHeight: "50" }}
-        ></ProDescriptions>
+        <Flex justify="space-between" >
+          <Title level={5}>Fiche de poste</Title>
+          
+          <Print endpoint={API_POSITIONS_ENDPOINT} id={position?.id} type="View" button_text="" endpoint_suffex="generate_pdf" permission="" />
+
+        </Flex>
+
+
+
+
+        <Divider style={{ marginTop: "10px" }} />
+
+        <Flex justify="space-between">
+   
+        <div className="mb-2"><span><b>Intulité de poste:</b> {position?.title}</span></div>
+
+          <div>
+            <Tag color={position?.grade?.color ? position?.grade?.color : "blue"}>{position?.grade?.name}</Tag>
+          </div>
+        </Flex>
+
+        <div className="mb-2"><span><b>Categorie:</b> <Tag>{position?.grade?.category}</Tag></span></div>
+        <div className="mb-2"><span><b>Formation:</b> {position?.formation}</span></div>
+        <div className="mb-2"><span><b>Expérience:</b> {position?.experience}</span></div>
+        <div className="mb-2"><span><b>Sous l’autorité de:</b> {position?.parent?.title}</span></div>
 
         <Divider />
 
-        <CustomTable
-          getColumns={getColumns(refetch)}
-          data={data}
-          isFetching={isFetching}
-          getPageSize={getPageSize}
-          isLoading={isLoading}
-          refetch={refetch}
-          setPage={setPage}
-          setPageSize={setPageSize}
-          setSearch={setSearch}
-          key="SUB_ARTICLES_TABLE"
-          rowSelectionFunction={rowSelectionFunction}
-          RowSelectionRnder={RowSelectionRnder}
-          headerTitle={
-          [  <AUForm refetch={refetch} tc={container?.id} initialvalues={null} />,
-            <div style={{marginRight:"10px"}}></div>,
-            <Export query_params={{tc__id: container?.id}} endpoint={API_SOUSARTICLES_ENDPOINT} expand="client,transitaire,box" key="SOUSARTICLESEXPORT" />,]
+        <Title level={5}>Missions principales</Title>
+        <Row style={{ gap: '8px' }}>
+          {position?.mission_principal}
+        </Row>
 
-          }
+
+
+        <Divider />
+        <Flex justify="space-between">
+          <Title level={5}>Responsabilités et Tâches: </Title>
+          <Row style={{ gap: '8px' }}>
+            <DownloadMissionTemplate positionTitle={position?.title} />
+            <UploadMissions
+              positionId={position?.id}
+              onSuccess={refetchMissions}
+            />
+          </Row>
+        </Flex>
+        <Row style={{ width: '100%', marginBottom: 16, gap: '8px' }}>
+          <AddMissionForm
+            refetch={refetchMissions}
+            position={position}
+          />
+        </Row>
+
+        <List
+          className="demo-loadmore-list"
+          loading={isLoadingMissions}
+          itemLayout="horizontal"
+          dataSource={missions?.data}
+          renderItem={(item: Mission) => (
+            <List.Item
+              actions={[<UpdateMissionForm key="list-loadmore-edit" refetch={refetchMissions} position={position} initialvalues={item} />, <Delete url={API_MISSIONS_ENDPOINT} refetch={refetchMissions} id={item?.id} class_name="Mission" type="link" text="" has_icon link={false} />]}
+            >
+              <Skeleton avatar title={false} loading={isLoadingMissions} active>
+
+                <Typography.Text>{item?.description}</Typography.Text>
+
+              </Skeleton>
+            </List.Item>
+          )}
         />
+
+        <Divider />
+
+        <Flex justify="space-between">
+          <Title level={5}>Compétences requises</Title>
+          <Row style={{ gap: '8px' }}>
+            <DownloadCompetenceTemplate positionTitle={position?.title} />
+            <UploadCompetences
+              positionId={position?.id}
+              onSuccess={refetchCompetences}
+            />
+          </Row>
+        </Flex>
+        <Row style={{ width: '100%', marginBottom: 16, gap: '8px' }}>
+          <AddCompetenceForm
+            refetch={refetchCompetences}
+            position={position}
+          />
+        </Row>
+
+
+        <List
+          style={{ marginBottom: "16px" }}
+          className="demo-loadmore-list"
+          loading={isLoadingCompetences}
+          itemLayout="horizontal"
+          dataSource={competences?.data}
+          renderItem={(item: Competence) => (
+            <List.Item
+              actions={[<UpdateCompetenceForm key="list-loadmore-edit" refetch={refetchCompetences} position={position} initialvalues={item} />, <Delete url={API_COMPETENCES_ENDPOINT} refetch={refetchCompetences} id={item?.id} class_name="Competence" type="link" text="" has_icon link={false} />]}
+            >
+              <Skeleton avatar title={false} loading={isLoadingCompetences} active>
+
+                <Typography.Text>{item?.description}</Typography.Text>
+
+              </Skeleton>
+            </List.Item>
+          )}
+        />
+
       </Drawer>
     </>
   );

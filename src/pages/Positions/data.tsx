@@ -3,7 +3,7 @@ import { TableDropdown } from "@ant-design/pro-components";
 import { Col, Popover, Row, Tag, Tooltip } from "antd";
 import { renderDateTime, renderText } from "@/utils/functions";
 import { API_POSITIONS_ENDPOINT } from "@/api/api";
-import SubArticlePage from "./ContainerDetails";
+import PositionDetails from "./PositionDetails";
 import Delete from "@/components/Delete";
 import AUForm from "./components/AUForm";
 import Print from "@/components/Print";
@@ -18,14 +18,14 @@ export const getColumns = (
       dataIndex: "organigram",
       key: "1",
       width: 100,
-      render: (record:any) => renderText(record?.name)
+      render: (record: any) => renderText(record?.name)
     },
     {
       title: "Title",
       key: "2",
       dataIndex: "title",
       width: 150,
-      render: (_,record: any) => <DetailsButton text={`${record?.title}`} navigate_to={`Positions/${record?.id}`} />,
+      render: (_, record: any) => <PositionDetails position={record} />,
     },
     {
       title: "Grade",
@@ -35,13 +35,32 @@ export const getColumns = (
       render: (record: any) => <Tag color={record?.color ? record?.color : "blue"}> {record?.name} </Tag>,
     },
     {
-      title: "Crée le",
-      key: "5",
-      dataIndex: "created_at",
-      width: 250,
-      render: (record: any) => renderDateTime(record?.created_at),
+      title: "Quantité",
+      key: "8",
+      dataIndex: "quantity",
     },
-  
+    {
+      title: "Formation",
+      key: "2",
+      dataIndex: "formation",
+      width: 150,
+      ellipsis: true,
+    }
+    ,
+    {
+      title: "Expérience",
+      key: "2",
+      dataIndex: "experience",
+      width: 150,
+      ellipsis: true,
+    },
+    {
+      title: "Missions principales",
+      key: "2",
+      dataIndex: "mission_principal",
+      width: 150,
+      ellipsis: true,
+    },
     {
       title: "Actions",
       valueType: "option",
@@ -59,7 +78,7 @@ export const getColumns = (
                   url={API_POSITIONS_ENDPOINT}
                   id={record?.id}
                   refetch={refetch}
-                  class_name="Conteneur"
+                  class_name="Position"
                   type="dashed"
                   link={false}
                   text=""
@@ -71,21 +90,12 @@ export const getColumns = (
                 <AUForm
                   initialvalues={record}
                   refetch={refetch}
-                  article={record?.article}
                   editText=""
                   hasIcon
                 />
               </Col>
               <Col>
-                <Print
-                  endpoint={API_POSITIONS_ENDPOINT}
-                  endpoint_suffex="check_list/"
-                  id={record?.id}
-                  key={record?.id}
-                  type="View"
-                  button_text="Check list"
-                  permission='app.print_checklist_tc'
-                />
+                <Print endpoint={API_POSITIONS_ENDPOINT} id={record?.id} type="View" button_text="" endpoint_suffex="generate_pdf" permission="" />
               </Col>
             </Row>,
           ]}

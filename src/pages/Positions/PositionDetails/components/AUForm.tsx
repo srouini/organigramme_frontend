@@ -5,7 +5,7 @@ import { Divider, Form, message, Row } from "antd";
 import usePost from "../../../../hooks/usePost";
 import { mapInitialValues } from "../../../../utils/functions";
 import { useReferenceContext } from "../../../../context/ReferenceContext";
-import { API_SOUSARTICLES_ENDPOINT } from "@/api/api";
+import { API_TASKS_ENDPOINT } from "@/api/api";
 import FormField from "@/components/form/FormField";
 import { YES_NO_CHOICES } from "@/utils/constants";
 import { EditOutlined, PlusOutlined } from "@ant-design/icons";
@@ -57,7 +57,7 @@ const AUForm: React.FC<AUFormProps> = ({
 
   const { mutate, isLoading } = usePost({
     onSuccess: onSuccess,
-    endpoint: API_SOUSARTICLES_ENDPOINT,
+    endpoint: API_TASKS_ENDPOINT,
   });
 
   return (
