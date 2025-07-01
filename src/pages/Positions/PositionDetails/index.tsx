@@ -83,19 +83,16 @@ export default ({ position }: PageProps) => {
       >
         <Flex justify="space-between" >
           <Title level={5}>Fiche de poste</Title>
-          
+
           <Print endpoint={API_POSITIONS_ENDPOINT} id={position?.id} type="View" button_text="" endpoint_suffex="generate_pdf" permission="" />
 
         </Flex>
 
-
-
-
         <Divider style={{ marginTop: "10px" }} />
 
         <Flex justify="space-between">
-   
-        <div className="mb-2"><span><b>Intulité de poste:</b> {position?.title}</span></div>
+
+          <div className="mb-2"><span><b>Intulité de poste:</b> {position?.title}</span></div>
 
           <div>
             <Tag color={position?.grade?.color ? position?.grade?.color : "blue"}>{position?.grade?.name}</Tag>

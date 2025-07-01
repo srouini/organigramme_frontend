@@ -25,6 +25,7 @@ import { BaseModel } from "./commun";
     title: string;
     grade: Grade;  // Foreign key to Grade, can be ID or object
     formation?: string;
+    quantity?: number;
     mission_principal?: string;
     experience?: string;
     position_x?: number;

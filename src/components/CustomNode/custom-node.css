@@ -1,0 +1,31 @@
+.custom-node {
+  position: relative;
+  min-width: 200px;
+  text-align: center;
+  color: white;
+  font-weight: bold;
+  border-radius: 4px;
+}
+
+.custom-handle {
+  width: 20px !important;
+  height: 8px !important;
+  background: white !important;
+  border: 2px solid #555 !important;
+  border-radius: 20px !important;
+  z-index: 10 !important;
+}
+
+/* Position the top handle */
+.custom-handle[data-handlepos="top"] {
+  top: -8px !important;
+  left: 50% !important;
+  transform: translateX(-50%) !important;
+}
+
+/* Position the bottom handle */
+.custom-handle[data-handlepos="bottom"] {
+  bottom: -8px !important;
+  left: 50% !important;
+  transform: translateX(-50%) !important;
+}

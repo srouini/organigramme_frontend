@@ -62,7 +62,7 @@ export const useOrganigram = (id: string) => {
     queryKey: ['organigram', id],
     queryFn: async () => {
       const { data } = await axios.get<OrganigramDetails>(
-        `${API_ORGANIGRAMMES_ENDPOINT}${id}/?expand=positions,edges`,
+        `${API_ORGANIGRAMMES_ENDPOINT}${id}/?expand=positions.grade,edges`
       )
       return data
     },
@@ -122,9 +122,12 @@ export const useCreateEdge = () => {
   const axios = useAxios()
   const qc = useQueryClient()
 
-  return useMutation<unknown, Error, EdgeCreatePayload>({
-    mutationFn: (payload) => axios.post(API_ORGANIGRAMMES_EDGE_ENDPOINT, payload).then(r => r.data),
-    onSuccess: (_, variables) => {
+  return useMutation<Edge, Error, EdgeCreatePayload>({
+    mutationFn: async (payload) => {
+      const { data } = await axios.post<Edge>(API_ORGANIGRAMMES_EDGE_ENDPOINT, payload);
+      return data;
+    },
+    onSuccess: (data, variables) => {
       qc.invalidateQueries({ queryKey: ['organigram', variables.organigram] })
     },
   })
@@ -140,4 +143,3 @@ export const useDeleteEdge = () => {
     mutationFn: ({ edgeId }) => axios.delete(`${API_ORGANIGRAMMES_EDGE_ENDPOINT}${edgeId}/`),
   })
 }
-

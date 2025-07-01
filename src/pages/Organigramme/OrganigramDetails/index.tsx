@@ -2,7 +2,7 @@ import { PageContainer } from "@ant-design/pro-components";
 
 import { API_ORGANIGRAMMES_ENDPOINT } from "@/api/api";
 import type { Connection } from 'reactflow';
-import { addEdge, MarkerType } from 'reactflow';
+import { addEdge, MarkerType, NodeTypes, Edge } from '@xyflow/react';
 import CustomButtonEdge from "@/components/ButtonEdge";
 import Export from "./components/Export";
 import { useCreateEdge } from '@/hooks/useOrganigram' 
@@ -22,11 +22,17 @@ import CustomNode from "@/components/CustomNode";
 import FloatingEdge from '@/components/FloatingEdge';
 import CustomConnectionLine from '@/components/CustomConnectionLine';
 
+interface PositionUpdatePayload {
+  id: string;
+  position_x: number;
+  position_y: number;
+}
+
 export default () => {
   const { id } = useParams<{ id: string }>();
-  const { data } = useOrganigram(id!);
-  const autoOrg = useAutoOrganize(id!);
-  const bulk = useBulkUpdatePositions();
+  const { data, isPending: isLoading, error } = useOrganigram(id!);
+  const { isPending: isAutoOrgLoading, mutate: autoOrg } = useAutoOrganize(id!);
+  const { isPending: isBulkLoading, mutate: bulk } = useBulkUpdatePositions();
 
   const {
     nodes,
@@ -39,14 +45,19 @@ export default () => {
 
   /* backend → React Flow nodes/edges */
   useEffect(() => {
+    console?.log(data?.positions)
     if (!data) return;
     setGraph(
       data.positions.map((p: any) => ({
+        type: 'custom',
         id: String(p.id),
         position: { x: p.position_x, y: p.position_y },
-        data: { label: p.title },
-        style: { background: p.color },
-
+        data: { 
+          position:p,
+        },
+        style: { 
+          // Styles are now handled by the CustomNode component
+        },
       })),
       data.edges.map((e: any) => ({
         id: String(e.id),
@@ -60,8 +71,16 @@ export default () => {
 
   const onDragStop = useCallback(
     async (_: any, node: any) => {
+      const handleBulkUpdate = async (positions: PositionUpdatePayload[]) => {
+        try {
+          await bulk(positions);
+          message.success('Positions updated successfully');
+        } catch (error) {
+          message.error('Failed to update positions');
+        }
+      };
       updateNode(node.id, node.position);
-      await bulk.mutateAsync([{ id: node.id, ...node.position }]);
+      await handleBulkUpdate([{ id: node.id, ...node.position }]);
     },
     [bulk, updateNode]
   );
@@ -73,8 +92,8 @@ export default () => {
   };
 
   
-  const nodeTypes = {
-    custom: CustomNode,
+  const nodeTypes: NodeTypes = {
+    custom: CustomNode as any, // Type assertion to handle the type mismatch
   };
   
   const connectionLineStyle = {
@@ -82,39 +101,90 @@ export default () => {
   };
 
   const onConnect = useCallback(
-  (conn: Connection) => {
-    createEdge(
-      {
-        organigram: id!,              // current chart
-        source: conn.source!,         // parent node id
-        target: conn.target!,         // child node id
-        edge_type:"buttonedge"
-      },
-      {
-        onSuccess: () => {
-          // only add to local state *after* the DB succeeds
-          setGraph(nodes, addEdge(conn, edges))
-        },
-        onError: (e: any) =>
-          message.error(
-            e.response?.data?.non_field_errors?.[0] ||
-              e.response?.data?.detail ||
-              'Link rejected',
-          ),
-      },
-    )
-  },
-  [createEdge, id, nodes, edges, setGraph],
-)
-const { toggleCollapse } = useFlow()
+    (connection: Connection) => {
+      const source = connection.source || '';
+      const target = connection.target || '';
+      
+      if (!source || !target) {
+        console.error('Missing source or target in connection:', connection);
+        return;
+      }
 
-const defaultEdgeOptions = {
-  type: 'floating',
-  markerEnd: {
-    type: MarkerType.ArrowClosed,
-    color: '#b1b1b7',
-  },
-};
+      // Create the edge via API
+      createEdge(
+        {
+          organigram: id!,
+          source,
+          target,
+          edge_type: "buttonedge"
+        },
+        {
+          onSuccess: (edgeResponse: Edge) => {
+            try {
+              console.log('Edge created:', edgeResponse);
+              
+              if (!edgeResponse?.id) {
+                console.error('Invalid edge response - missing ID:', edgeResponse);
+                throw new Error('Invalid edge response from server - missing ID');
+              }
+              
+              // Create the new edge with the data from the server
+              const newEdge: Edge = {
+                id: edgeResponse.id,
+                source: edgeResponse.source,
+                target: edgeResponse.target,
+                sourceHandle: connection.sourceHandle || undefined,
+                targetHandle: connection.targetHandle || undefined,
+                type: 'arrowclosed',
+                data: { 
+                  organigramId: id,
+                },
+                style: { 
+                  stroke: '#b1b1b7', 
+                  strokeWidth: 2, 
+                  
+                },
+                markerEnd: {
+                  type: MarkerType.ArrowClosed,
+                  color: '#b1b1b7',
+                 
+                },
+              };
+              
+              // Add the new edge to the graph
+              setGraph(nodes, [...edges, newEdge]);
+              
+              console.log('Edge created successfully:', newEdge);
+            } catch (error) {
+              console.error('Error processing edge creation:', error);
+              message.error('Failed to process the created connection');
+            }
+          },
+          onError: (error: any) => {
+            console.error('Failed to create edge:', error);
+            message.error(
+              error.response?.data?.non_field_errors?.[0] ||
+              error.response?.data?.detail ||
+              'Failed to create connection'
+            );
+          },
+        }
+      );
+    },
+    [createEdge, id, nodes, edges, setGraph],
+  )
+
+  const { toggleCollapse } = useFlow()
+
+  const defaultEdgeOptions = {
+    type: 'smoothstep',
+    style: { stroke: '#b1b1b7', strokeWidth: 2},
+    markerEnd: {
+      type: MarkerType.ArrowClosed,
+      color: '#b1b1b7',
+    },
+    interactionWidth: 20,
+  };
 
   return (
     <PageContainer
@@ -129,12 +199,19 @@ const defaultEdgeOptions = {
           />,
           <Button
             type="primary"
-            onClick={() =>
-              autoOrg
-                .mutateAsync()
-                .then(() => message.success("Auto-organised!"))
-            }
-            loading={autoOrg.isLoading}
+            onClick={async () => {
+              const handleAutoOrganize = async () => {
+                try {
+                  await autoOrg();
+                  message.success('Organization completed successfully');
+                } catch (error) {
+                  message.error('Failed to auto-organize');
+                }
+              };
+              await handleAutoOrganize();
+            }}
+            loading={isAutoOrgLoading}
+            disabled={isLoading || isBulkLoading}
           >
             Auto-organise
           </Button>,
@@ -147,19 +224,27 @@ const defaultEdgeOptions = {
           edges={edges}
           onNodesChange={onNodesChange}
           onEdgesChange={onEdgesChange}
-          edgeTypes={edgeTypes}
           onConnect={onConnect}
           onNodeDragStop={onDragStop}
-          fitView={true}
           onNodeDoubleClick={(e, node) => toggleCollapse(node.id)}
           nodeTypes={nodeTypes}
+          edgeTypes={edgeTypes}
           defaultEdgeOptions={defaultEdgeOptions}
           connectionLineComponent={CustomConnectionLine}
           connectionLineStyle={connectionLineStyle}
+          nodesDraggable
+          nodesConnectable
+          elementsSelectable
+          panOnScroll
+          zoomOnScroll
+          zoomOnPinch
+          panOnDrag
+          fitView
+          fitViewOptions={{ padding: 0.5 }}
         >
           <Background />
           <Controls />
-          <ZoomSlider position="top-left"/>
+          <ZoomSlider position="top-left" defaultValue={100}/>
         </ReactFlow>
       </div>
     </PageContainer>
