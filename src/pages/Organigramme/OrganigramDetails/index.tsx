@@ -45,7 +45,6 @@ export default () => {
 
   /* backend → React Flow nodes/edges */
   useEffect(() => {
-    console?.log(data?.positions)
     if (!data) return;
     setGraph(
       data.positions.map((p: any) => ({

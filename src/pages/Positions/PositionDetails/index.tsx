@@ -17,14 +17,16 @@ import UploadMissions from "./components/UploadMissions";
 import DownloadCompetenceTemplate from "./components/DownloadCompetenceTemplate";
 import UploadCompetences from "./components/UploadCompetences";
 import Print from "@/components/Print";
+import { FileProtectOutlined } from "@ant-design/icons";
 
 const { Title } = Typography;
 
 interface PageProps {
   position: Position;
+  node?: boolean;
 }
 
-export default ({ position }: PageProps) => {
+export default ({ position, node=false }: PageProps) => {
   const [open, setOpen] = useState(false);
 
 
@@ -72,10 +74,11 @@ export default ({ position }: PageProps) => {
 
   return (
     <>
-      <Button onClick={showDrawer} type="link">{position?.title}</Button>
+      {!node && <Button onClick={showDrawer} type="link">{position?.title}</Button>}
+      {node && <Button onClick={showDrawer} style={{position: 'absolute', bottom: '10px', right: '10px'}}  icon={<FileProtectOutlined />}></Button>}
 
       <Drawer
-        width={1000}
+        width={node ? 800 : 1000}
         placement="right"
         closable={false}
         onClose={onClose}

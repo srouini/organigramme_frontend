@@ -30,13 +30,8 @@ const AUForm: React.FC<AUFormProps> = ({
   const [form] = Form.useForm();
   const [open, setOpen] = useState(false);
 
-  const { transitaire, client,box } = useReferenceContext();
+  const { organigrams } = useReferenceContext();
 
-  useEffect(() => {
-    client?.fetch();
-    transitaire?.fetch();
-    box?.fetch();
-  }, []);
 
   const {} = useReferenceContext();
 
@@ -53,6 +48,7 @@ const AUForm: React.FC<AUFormProps> = ({
     message.success("Submission successful");
     setOpen(false);
     refetch();
+    organigrams?.refetch();
   };
 
   const { mutate, isLoading } = usePost({

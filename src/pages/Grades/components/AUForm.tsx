@@ -44,6 +44,7 @@ const AUForm: React.FC<AUFormProps> = ({
 
    const handleChange = (color: Color) => {
     const hex = color.toHexString(); // get color in hex
+    setColorHex(hex);
   };
 
   const handleFormSubmission = async () => {

@@ -37,6 +37,8 @@ const AUForm: React.FC<AUFormProps> = ({
   const [form] = Form.useForm();
   const [open, setOpen] = useState(false);
 
+  const { organigrams } = useReferenceContext();
+
   const handleFormSubmission = async () => {
     let values = await form.validateFields();
     if (initialvalues) {
@@ -50,6 +52,7 @@ const AUForm: React.FC<AUFormProps> = ({
     message.success("Submission successful");
     setOpen(false);
     refetch();
+    organigrams?.refetch();
   };
 
   const { mutate, isLoading } = usePost({

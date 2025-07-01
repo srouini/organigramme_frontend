@@ -73,7 +73,7 @@ const AUForm: React.FC<AUFormProps> = ({
     <DraggableModel
       OkButtontext="Submit"
       modalOpenButtonText={initialvalues ? editText : addText} 
-      modalTitle="Conteneur"
+      modalTitle="Position"
       addButtonType="dashed"
       addButtonIcon={
         hasIcon && initialvalues ? <EditOutlined /> : <PlusOutlined />
@@ -104,6 +104,12 @@ const AUForm: React.FC<AUFormProps> = ({
             label="Title"
             type="text"
             required
+            span_md={24}
+          />
+            <FormField
+            name="abbreviation"
+            label="Abbreviation"
+            type="text"
             span_md={24}
           />
           <FormField

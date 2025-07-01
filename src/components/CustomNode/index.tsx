@@ -4,6 +4,8 @@ import { Avatar, Badge, Col, Flex, Row, Tag } from 'antd';
 import { Position as PositionType } from '@/types/reference';
 import { useCallback, useMemo, useState } from 'react';
 import { UserOutlined } from '@ant-design/icons';
+import PositionDetails from '@/pages/Positions/PositionDetails';
+
 
 interface CustomNodeProps {
   data: {
@@ -18,10 +20,16 @@ export default function CustomNode({ data, id, selected }: CustomNodeProps) {
   const [isHovered, setIsHovered] = useState(false);
   const { setNodes } = useReactFlow();
 
+
   const nodeStyles = useMemo(() => ({
     card: {
       minWidth: 200,
+      minHeight: 100,
       maxWidth: 350,
+      alignItems: 'center',
+      justifyContent: 'center',
+      display: 'flex',
+      
       backgroundColor: 'white',
       borderColor: selected ? '#1890ff' : '#d9d9d9',
       borderWidth: selected ? 2 : 1,
@@ -52,20 +60,26 @@ export default function CustomNode({ data, id, selected }: CustomNodeProps) {
     setIsHovered(false);
   }, []);
 
-  return (
+  const NodeContent = (
     <div
       className="custom-node"
       style={nodeStyles.card}
       onMouseEnter={handleMouseEnter}
       onMouseLeave={handleMouseLeave}
+      role="button"
+      tabIndex={0}
     >
-      <Handle
-        type="target"
-        position={Position.Top}
-        className="custom-handle"
-
-      />
-      <Row gutter={16}>
+      {
+        !data?.position?.initial_node && (
+          <Handle
+            type="target"
+            position={Position.Top}
+            className="custom-handle"
+          />
+        )
+      }
+    {/* Node content */}
+        <Row gutter={16}>
         <Col span={6}>
         <Flex justify="center" align="center" style={{height: '100%'}}>
           <Badge count={data?.position?.quantity} >
@@ -83,15 +97,30 @@ export default function CustomNode({ data, id, selected }: CustomNodeProps) {
           >
             {data?.position?.grade?.name}
           </Tag>
+          
         </Row>
         </Col>
+
       </Row>
      
+      
       <Handle
         type="source"
         position={Position.Bottom}
         className="custom-handle"
       />
+      <PositionDetails position={data?.position} node={true} />
     </div>
   );
+
+  // Wrap with Badge.Ribbon if position has an abbreviation
+  if (data?.position?.abbreviation) {
+    return (
+      <Badge.Ribbon text={data.position.abbreviation} color={data.position.grade?.color}>
+        {NodeContent}
+      </Badge.Ribbon>
+    );
+  }
+
+  return NodeContent;
 }
