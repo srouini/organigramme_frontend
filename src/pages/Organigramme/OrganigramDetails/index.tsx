@@ -241,7 +241,13 @@ export default () => {
           zoomOnPinch
           panOnDrag
           fitView
-          fitViewOptions={{ padding: 0.5 }}
+          minZoom={0.1}  // Allow zooming out more for large organigrams
+          maxZoom={2}    // Limit maximum zoom to prevent pixelation
+          fitViewOptions={{ 
+            padding: 0.2,  // Reduce padding to fit more content
+            includeHiddenNodes: false,
+            duration: 250  // Smoother transition
+          }}
         >
           <Background />
           <Controls />
