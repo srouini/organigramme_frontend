@@ -9,17 +9,12 @@ import AUForm from "./components/AUForm";
 import Print from "@/components/Print";
 import { SafetyCertificateOutlined } from "@ant-design/icons";
 import DetailsButton from "@/components/DetailsButton";
+import Clone from "./components/Clone";
 
 export const getColumns = (
   refetch: () => void,
 ): ProColumns<any>[] => [
-    {
-      title: "Organigramme",
-      dataIndex: "organigram",
-      key: "1",
-      width: 100,
-      render: (record: any) => renderText(record?.name)
-    },
+
     {
       title: "Title",
       key: "2",
@@ -62,6 +57,13 @@ export const getColumns = (
       ellipsis: true,
     },
     {
+      title: "Organigramme",
+      dataIndex: "organigram",
+      key: "1",
+      width: 100,
+      render: (record: any) => renderText(record?.name)
+    },
+    {
       title: "Actions",
       valueType: "option",
       key: "Actions",
@@ -88,6 +90,14 @@ export const getColumns = (
               </Col>
               <Col>
                 <AUForm
+                  initialvalues={record}
+                  refetch={refetch}
+                  editText=""
+                  hasIcon
+                />
+              </Col>
+              <Col>
+                <Clone
                   initialvalues={record}
                   refetch={refetch}
                   editText=""

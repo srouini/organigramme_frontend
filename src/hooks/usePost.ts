@@ -6,17 +6,23 @@ import { message } from "antd";
 interface UsePostProps {
   onSuccess: (response: any) => void;
   endpoint: string;
+  full_endpoint?: boolean;
   values?: any;
 }
 
-const usePost = ({ onSuccess, endpoint }: UsePostProps) => {
+const usePost = ({ onSuccess, endpoint, full_endpoint=false }: UsePostProps) => {
   const api = useAxios();
   const mutation: UseMutationResult<any, AxiosError<any>, any> = useMutation({
     mutationFn: async (values: any) => {
-      const url = values.id ? `${endpoint}${values.id}/` : endpoint;
+      let url:string;
+      if(full_endpoint){
+        url = endpoint;
+      }else{
+        url = values.id ? `${endpoint}${values.id}/` : endpoint;
+      }
 
       // Determine whether to use PUT or POST based on the presence of `values.id`
-      const response: AxiosResponse = values.id
+      const response: AxiosResponse = values.id && !full_endpoint
         ? await api.patch(url, values)
         : await api.post(url, values);
 
