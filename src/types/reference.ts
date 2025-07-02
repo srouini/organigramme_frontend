@@ -29,6 +29,7 @@ import { BaseModel } from "./commun";
     mission_principal?: string;
     experience?: string;
     abbreviation?: string;  
+    category?: string;
     position_x?: number;
     position_y?: number;
     initial_node?: boolean;

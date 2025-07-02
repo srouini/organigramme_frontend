@@ -23,7 +23,7 @@ interface AUFormProps {
   editText?: string;
   addText?: string;
   hasIcon?: boolean;
-  disabled?:boolean
+  disabled?: boolean
 
 }
 
@@ -33,26 +33,26 @@ const AUForm: React.FC<AUFormProps> = ({
   editText = "MODIFIER",
   addText = "Mrn",
   hasIcon = false,
-  disabled=false
+  disabled = false
 }) => {
   const [form] = Form.useForm();
   const [open, setOpen] = useState(false);
 
-  const { grades,organigrams } = useReferenceContext();
+  const { grades, organigrams } = useReferenceContext();
 
   useEffect(() => {
     grades.fetch();
     organigrams.fetch();
   }, []);
 
-  const {} = useReferenceContext();
+  const { } = useReferenceContext();
 
   const handleFormSubmission = async () => {
     let values = await form.validateFields();
     if (initialvalues) {
       values.id = initialvalues?.id;
     }
-    
+
     mutate(values);
   };
 
@@ -72,7 +72,7 @@ const AUForm: React.FC<AUFormProps> = ({
   return (
     <DraggableModel
       OkButtontext="Submit"
-      modalOpenButtonText={initialvalues ? editText : addText} 
+      modalOpenButtonText={initialvalues ? editText : addText}
       modalTitle="Position"
       addButtonType="dashed"
       addButtonIcon={
@@ -89,7 +89,7 @@ const AUForm: React.FC<AUFormProps> = ({
       <FormObject form={form} initialvalues={mapInitialValues(initialvalues)}>
         <Row gutter={24}>
 
-        <FormField
+          <FormField
             name="organigram"
             label="Organigramme"
             type="select"
@@ -98,7 +98,7 @@ const AUForm: React.FC<AUFormProps> = ({
             required
             span_md={24}
           />
-          <Divider style={{marginTop:"0px"}}/>
+          <Divider style={{ marginTop: "0px" }} />
           <FormField
             name="title"
             label="Title"
@@ -106,7 +106,7 @@ const AUForm: React.FC<AUFormProps> = ({
             required
             span_md={24}
           />
-            <FormField
+          <FormField
             name="abbreviation"
             label="Abbreviation"
             type="text"
@@ -121,12 +121,19 @@ const AUForm: React.FC<AUFormProps> = ({
             required
             span_md={24}
           />
-          <Divider style={{marginTop:"0px"}}/>
+          <FormField
+            name="category"
+            label="Categorie"
+            type="text"
+            
+            span_md={24}
+          />
+          <Divider style={{ marginTop: "0px" }} />
 
-              <Form.Item label="Mission Principale" name="mission_principal" required style={{ width: '100%' }}>
-                      <TextArea rows={4} />
-                    </Form.Item>
-                    
+          <Form.Item label="Mission Principale" name="mission_principal" required style={{ width: '100%' }}>
+            <TextArea rows={4} />
+          </Form.Item>
+
           <FormField
             name="formation"
             label="Formation"

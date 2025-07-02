@@ -34,7 +34,7 @@
     "decimal.js": "^10.4.3",
     "emotion": "^11.0.0",
     "file-saver": "^2.0.5",
-    "html-to-image": "^1.11.11",
+    "html-to-image": "^1.11.13",
     "input-otp": "^1.4.2",
     "js-cookie": "^3.0.5",
     "jsonwebtoken": "^9.0.2",

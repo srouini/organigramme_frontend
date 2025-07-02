@@ -193,11 +193,7 @@ export default () => {
       header={{
         title: "Organigrammes",
         extra: [
-          <Export
-            endpoint={API_ORGANIGRAMMES_ENDPOINT}
-            expand="type_tc,current_scelle,article.gros,charge_chargement"
-            key="ALLCONTAINERS"
-          />,
+
           <Button
             type="primary"
             onClick={async () => {

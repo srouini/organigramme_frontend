@@ -1,157 +1,56 @@
-import { useEffect, useState } from "react";
-import DraggableModel from "@/components/DraggableModel";
-import FormObject from "@/components/Form";
-import { Divider, Form, message, Row } from "antd";
-import usePost from "@/hooks/usePost";
-import { mapInitialValues } from "@/utils/functions";
-import { useReferenceContext } from "@/context/ReferenceContext";
+import { message, Modal, Button } from "antd";
+import { CopyOutlined } from "@ant-design/icons";
+import  usePost  from "@/hooks/usePost";
 import { API_POSITIONS_ENDPOINT } from "@/api/api";
-import FormField from "@/components/form/FormField";
-import { YES_NO_CHOICES } from "@/utils/constants";
-import { CopyOutlined, EditOutlined, PlusOutlined } from "@ant-design/icons";
 import { usePermissions } from "@/utils/permissions";
-import TextArea from "antd/es/input/TextArea";
 
-const formatDate = (field: string, values: any) => {
-  if (values[field]) values[field] = values[field].format("YYYY-MM-DD");
-  return values;
-};
-
-interface AUFormProps {
+interface CloneProps {
   refetch: () => void;
-  initialvalues?: any;
-  editText?: string;
-  addText?: string;
-  hasIcon?: boolean;
-  disabled?: boolean
-
+  initialvalues: any;
+  disabled?: boolean;
+  buttonText?: string;
 }
 
-const Clone: React.FC<AUFormProps> = ({
+const Clone: React.FC<CloneProps> = ({
   refetch,
   initialvalues,
-  editText = "MODIFIER",
-  addText = "Mrn",
-  hasIcon = false,
-  disabled = false
+  disabled = false,
+  buttonText = "Cloner"
 }) => {
-  const [form] = Form.useForm();
-  const [open, setOpen] = useState(false);
-
-  const { grades, organigrams } = useReferenceContext();
-
-  useEffect(() => {
-    grades.fetch();
-    organigrams.fetch();
-  }, []);
-
-  const { } = useReferenceContext();
-
-  const handleFormSubmission = async () => {
-    let values = await form.validateFields();
-    if (initialvalues) {
-      values.id = initialvalues?.id;
-    }
-
-    mutate(values);
-  };
+  const { confirm } = Modal;
+  const hasPermission = usePermissions();
 
   const onSuccess = () => {
     message.success("La position a été clonée avec succès.");
-    setOpen(false);
     refetch();
   };
 
-  const { mutate, isLoading } = usePost({
+  const { mutate: clonePosition, isLoading } = usePost({
     onSuccess: onSuccess,
-    endpoint: API_POSITIONS_ENDPOINT+initialvalues?.id+"/clone/",
-    full_endpoint:true
+    endpoint: `${API_POSITIONS_ENDPOINT}${initialvalues?.id}/clone/`,
+    full_endpoint: true
   });
 
-  const hasPermission = usePermissions();
+  const showConfirm = () => {
+    confirm({
+      title: 'Confirmer le clonage',
+      content: `Voulez-vous vraiment cloner la position "${initialvalues?.title}" ?`,
+      okText: 'Oui, cloner',
+      cancelText: 'Annuler',
+      onOk: () => clonePosition({}),
+      okButtonProps: { loading: isLoading }
+    });
+  };
 
   return (
-    <DraggableModel
-      OkButtontext="Submit"
-      modalOpenButtonText={initialvalues ? editText : addText}
-      modalTitle="Position"
-      addButtonType="dashed"
-      addButtonIcon={
-        <CopyOutlined />
-      }
-      disabledModalOpenButton={disabled || (!initialvalues && !hasPermission('app.add_tc')) || (initialvalues && !hasPermission('app.change_tc'))}
-      onSubmit={handleFormSubmission}
-      setOpen={setOpen}
-      open={open}
-      width={600}
-      isLoading={isLoading}
-      initialvalues={initialvalues}
+    <Button
+      type="default"
+      icon={<CopyOutlined />}
+      onClick={showConfirm}
+      disabled={disabled || !hasPermission('app.add_tc')}
+      loading={isLoading}
     >
-      <FormObject form={form} initialvalues={mapInitialValues({ ...initialvalues, title: initialvalues?.title + "_clone" })}>
-        <Row gutter={24}>
-
-          <FormField
-            name="organigram"
-            label="Organigramme"
-            type="select"
-            options={organigrams?.results}
-            option_label="name"
-            required
-            span_md={24}
-          />
-          <Divider style={{ marginTop: "0px" }} />
-          <FormField
-            name="title"
-            label="Title"
-            type="text"
-            required
-            span_md={24}
-          />
-          <FormField
-            name="abbreviation"
-            label="Abbreviation"
-            type="text"
-            span_md={24}
-          />
-          <FormField
-            name="grade"
-            label="Grade"
-            type="select"
-            options={grades?.results}
-            option_label="name"
-            required
-            span_md={24}
-          />
-          <Divider style={{ marginTop: "0px" }} />
-
-          <Form.Item label="Mission Principale" name="mission_principal" required style={{ width: '100%' }}>
-            <TextArea rows={4} />
-          </Form.Item>
-
-          <FormField
-            name="formation"
-            label="Formation"
-            type="text"
-            required
-            span_md={24}
-          />
-          <FormField
-            name="experience"
-            label="Expérience"
-            type="text"
-            required
-            span_md={24}
-          />
-          <FormField
-            name="quantity"
-            label="Quantité"
-            type="number"
-            required
-            span_md={24}
-          />
-        </Row>
-      </FormObject>
-    </DraggableModel>
+    </Button>
   );
 };
 

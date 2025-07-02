@@ -47,12 +47,11 @@ export const getMetas = (
               url={API_ORGANIGRAMMES_ENDPOINT}
               id={record.id}
               refetch={refetch}
-              class_name="Conteneur"
+              class_name="Organigramme"
               type="dashed"
               link={false}
               text=""
               has_icon
-              permission="app.delete_tc"
             />
           </Col>
           <Col>

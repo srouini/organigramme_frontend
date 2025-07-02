@@ -14,7 +14,11 @@ import Clone from "./components/Clone";
 export const getColumns = (
   refetch: () => void,
 ): ProColumns<any>[] => [
-
+  {
+    title: "ABB",
+    key: "abbreviation",
+    dataIndex: "abbreviation",
+  },
     {
       title: "Title",
       key: "2",
@@ -28,6 +32,12 @@ export const getColumns = (
       dataIndex: "grade",
       width: 150,
       render: (record: any) => <Tag color={record?.color ? record?.color : "blue"}> {record?.name} </Tag>,
+    },
+    {
+      title: "Categorie",
+      key: "34",
+      dataIndex: "category",
+      render: (_, record: any) => record?.category ? <Tag>{record?.category}</Tag> : <Tag>{record?.grade?.category}</Tag>
     },
     {
       title: "Quantité",
@@ -100,8 +110,6 @@ export const getColumns = (
                 <Clone
                   initialvalues={record}
                   refetch={refetch}
-                  editText=""
-                  hasIcon
                 />
               </Col>
               <Col>
