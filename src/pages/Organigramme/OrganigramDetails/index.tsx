@@ -2,7 +2,7 @@ import { PageContainer } from "@ant-design/pro-components";
 
 import { API_ORGANIGRAMMES_ENDPOINT } from "@/api/api";
 import type { Connection } from 'reactflow';
-import { addEdge, MarkerType, NodeTypes, Edge } from '@xyflow/react';
+import { addEdge, MarkerType, NodeTypes, Edge, SmoothStepEdge } from '@xyflow/react';
 import CustomButtonEdge from "@/components/ButtonEdge";
 import Export from "./components/Export";
 import { useCreateEdge } from '@/hooks/useOrganigram' 
@@ -88,15 +88,27 @@ export default () => {
 
   const edgeTypes = {
     buttonedge: CustomButtonEdge,
+    smoothstep: SmoothStepEdge,
+    default: SmoothStepEdge,
   };
 
-  
   const nodeTypes: NodeTypes = {
     custom: CustomNode as any, // Type assertion to handle the type mismatch
   };
   
   const connectionLineStyle = {
     stroke: '#b1b1b7',
+    strokeWidth: 2,
+  };
+
+  const defaultEdgeOptions = {
+    type: 'smoothstep',
+    style: { stroke: '#b1b1b7', strokeWidth: 2 },
+    markerEnd: {
+      type: MarkerType.ArrowClosed,
+      color: '#b1b1b7',
+    },
+    interactionWidth: 20,
   };
 
   const onConnect = useCallback(
@@ -134,19 +146,17 @@ export default () => {
                 target: edgeResponse.target,
                 sourceHandle: connection.sourceHandle || undefined,
                 targetHandle: connection.targetHandle || undefined,
-                type: 'arrowclosed',
+                type: 'smoothstep',
                 data: { 
                   organigramId: id,
                 },
                 style: { 
-                  stroke: '#b1b1b7', 
-                  strokeWidth: 2, 
-                  
+                  stroke: '#b1b1b7',
+                  strokeWidth: 2,
                 },
                 markerEnd: {
                   type: MarkerType.ArrowClosed,
                   color: '#b1b1b7',
-                 
                 },
               };
               
@@ -175,15 +185,7 @@ export default () => {
 
   const { toggleCollapse } = useFlow()
 
-  const defaultEdgeOptions = {
-    type: 'smoothstep',
-    style: { stroke: '#b1b1b7', strokeWidth: 2},
-    markerEnd: {
-      type: MarkerType.ArrowClosed,
-      color: '#b1b1b7',
-    },
-    interactionWidth: 20,
-  };
+
 
   return (
     <PageContainer
