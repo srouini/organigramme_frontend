@@ -98,11 +98,6 @@ export default () => {
             <DownloadTemplate />
             <UploadGrades refetch={refetch} />
             <Divider type="vertical" />
-            <Export 
-              endpoint={API_GRADES_ENDPOINT} 
-              expand="type_tc,current_scelle,article.gros,charge_chargement" 
-              key="ALLCONTAINERS" 
-            />
             <AUForm refetch={refetch} addText="Grade" />
           </Space>
         )

@@ -6,7 +6,7 @@ import { addEdge, MarkerType, NodeTypes, Edge, SmoothStepEdge } from '@xyflow/re
 import CustomButtonEdge from "@/components/ButtonEdge";
 import Export from "./components/Export";
 import { useCreateEdge } from '@/hooks/useOrganigram' 
-import { ReactFlow, Background, Controls } from "@xyflow/react";
+import { ReactFlow, Background, Controls, Panel } from "@xyflow/react";
 import "@xyflow/react/dist/style.css";
 import { Button, message } from "antd";
 import { useParams } from "react-router-dom";
@@ -18,6 +18,7 @@ import {
 import { useFlow } from "@/context/FlowContext";
 import { useEffect, useCallback } from "react";
 import { ZoomSlider } from "@/components/zoom-slider";
+import SearchControl from "./components/SearchControl";
 import CustomNode from "@/components/CustomNode";
 import FloatingEdge from '@/components/FloatingEdge';
 import CustomConnectionLine from '@/components/CustomConnectionLine';
@@ -215,7 +216,7 @@ export default () => {
         ],
       }}
     >
-      <div style={{ height: "80dvh", width: "100%" }}>
+      <div style={{ height: 'calc(100vh - 200px)', width: '100%' }}>
         <ReactFlow
           nodes={nodes}
           edges={edges}
@@ -247,7 +248,10 @@ export default () => {
         >
           <Background />
           <Controls />
-          <ZoomSlider position="top-left" defaultValue={100}/>
+          <ZoomSlider />
+          <Panel position="top-right">
+            <SearchControl />
+          </Panel>
         </ReactFlow>
       </div>
     </PageContainer>

@@ -27,7 +27,8 @@ interface FormFieldProps {
   minDate?:any;
   minValue?:number;
   maxValue?:number;
-  rules?:any
+  rules?:any;
+  allowClear?: boolean;
 }
 
 const FormField: React.FC<FormFieldProps> = ({
@@ -50,7 +51,8 @@ const FormField: React.FC<FormFieldProps> = ({
   maxDate, 
   minValue, 
   maxValue,
-  rules
+  rules,
+  allowClear = false,
 }) => {
   switch (type) {
     case "text":
@@ -132,7 +134,8 @@ const FormField: React.FC<FormFieldProps> = ({
             fieldProps={{
               fieldNames: { label: option_label, value: option_value },
               maxTagCount: 'responsive',
-              defaultValue:defaultValue
+              defaultValue:defaultValue,
+              allowClear,
             }}
             placeholder={placeholder}
             rules={rules}

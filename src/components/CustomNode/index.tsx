@@ -7,7 +7,7 @@ import { UserOutlined, ExpandAltOutlined } from '@ant-design/icons';
 import PositionDetails from '@/pages/Positions/PositionDetails';
 import NodeDetailsModal from '../NodeDetails/NodeDetailsModal';
 import { calculateLayout } from '../NodeDetails/treeLayout';
-import type { CustomNodeProps } from './types';
+import type { CustomNodeProps, CustomNodeData } from './types';
 
 
 
@@ -43,16 +43,17 @@ const CustomNode: FC<CustomNodeProps> = ({ data, id, selected }) => {
       justifyContent: 'center',
       display: 'flex',
       backgroundColor: 'white',
-      borderColor: selected ? '#1890ff' : '#d9d9d9',
-      borderWidth: selected ? 2 : 1,
+      borderColor: data.isHighlighted ? '#ff4d4f' : (selected ? '#1890ff' : '#d9d9d9'),
+      borderWidth: data.isHighlighted || selected ? 2 : 1,
       borderRadius: '8px',
       padding: '16px',
-      paddingX: '0px',
-      boxShadow: selected
+      boxShadow: data.isHighlighted
+        ? '0 4px 12px rgba(255, 77, 79, 0.5)'
+        : selected
         ? '0 4px 12px rgba(24, 144, 255, 0.3)'
         : isHovered
-          ? '0 6px 16px rgba(0, 0, 0, 0.1)'
-          : 'none',
+        ? '0 6px 16px rgba(0, 0, 0, 0.1)'
+        : 'none',
       transform: isHovered ? 'translateY(-2px)' : 'none',
       transition: 'all 0.3s ease',
       cursor: 'pointer',
@@ -63,7 +64,14 @@ const CustomNode: FC<CustomNodeProps> = ({ data, id, selected }) => {
       color: data.position?.grade?.color,
       border: `1px solid ${data.position?.grade?.color}40`,
     },
-  }), [selected, isHovered, data.position?.grade?.color]);
+  }), [selected, isHovered, data.position?.grade?.color, data.isHighlighted]);
+
+  const modalTitle = useMemo(() => {
+    if (data.position.initial_node) {
+      return `Initial Position: ${data.position.title}`;
+    }
+    return data.position.title;
+  }, [data.position]);
 
   const renderNodeContent = () => (
     <div
@@ -131,6 +139,7 @@ const CustomNode: FC<CustomNodeProps> = ({ data, id, selected }) => {
         onClose={handleCloseModal}
         nodes={detailNodes}
         edges={detailEdges}
+        title={modalTitle}
       />
     </div>
   );

@@ -5,6 +5,7 @@ import {
   EdgeLabelRenderer,
   EdgeProps,
   getSmoothStepPath,
+  Position,
 } from "@xyflow/react";
 
 export const ButtonEdge = ({
@@ -25,8 +26,31 @@ export const ButtonEdge = ({
     targetX,
     targetY,
     targetPosition,
-    borderRadius: 10, // Optional: adds rounded corners to the steps
+    borderRadius: 10,
   });
+
+  const offset = 25;
+  let buttonX = labelX;
+  let buttonY = labelY;
+
+  if (targetPosition) {
+    buttonX = targetX;
+    buttonY = targetY;
+    switch (targetPosition) {
+      case Position.Top:
+        buttonY -= offset;
+        break;
+      case Position.Bottom:
+        buttonY += offset;
+        break;
+      case Position.Left:
+        buttonX -= offset;
+        break;
+      case Position.Right:
+        buttonX += offset;
+        break;
+    }
+  }
 
   return (
     <>
@@ -35,7 +59,7 @@ export const ButtonEdge = ({
         <div
           className="nodrag nopan pointer-events-auto absolute"
           style={{
-            transform: `translate(-50%, -50%) translate(${labelX}px,${labelY}px)`,
+            transform: `translate(-50%, -50%) translate(${buttonX}px,${buttonY}px)`,
           }}
         >
           {children}

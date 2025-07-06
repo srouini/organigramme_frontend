@@ -2,7 +2,7 @@ import { Node, Edge } from '@xyflow/react';
 
 export const NODE_WIDTH = 250;
 export const NODE_HEIGHT = 140;
-const HORIZONTAL_SPACING = 100;
+const HORIZONTAL_SPACING = 150;
 const LEVEL_HEIGHT = 300;
 const SUBTREE_PADDING = 60;
 const ROOT_NODE_TOP_PADDING = 100;

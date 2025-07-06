@@ -38,11 +38,12 @@ const AUForm: React.FC<AUFormProps> = ({
   const [form] = Form.useForm();
   const [open, setOpen] = useState(false);
 
-  const { grades, organigrams } = useReferenceContext();
+  const { grades, organigrams, positions } = useReferenceContext();
 
   useEffect(() => {
     grades.fetch();
     organigrams.fetch();
+    positions.fetch();
   }, []);
 
   const { } = useReferenceContext();
@@ -60,6 +61,7 @@ const AUForm: React.FC<AUFormProps> = ({
     message.success("Submission successful");
     setOpen(false);
     refetch();
+    positions?.refetch();
   };
 
   const { mutate, isLoading } = usePost({
@@ -97,6 +99,15 @@ const AUForm: React.FC<AUFormProps> = ({
             option_label="name"
             required
             span_md={24}
+          />
+          <FormField
+            name="parent"
+            label="Supérieur Hiérarchique"
+            type="select"
+            options={positions?.results?.filter((p: any) => p.id !== initialvalues?.id)}
+            option_label="title"
+            span_md={24}
+            allowClear
           />
           <Divider style={{ marginTop: "0px" }} />
           <FormField

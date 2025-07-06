@@ -41,7 +41,7 @@ export default () => {
       page: page,
       page_size: getPageSize(),
       ...filters,
-      expand: "organigram,grade",
+      expand: "organigram,grade,edges",
       ordering: "-id",
     },
   });

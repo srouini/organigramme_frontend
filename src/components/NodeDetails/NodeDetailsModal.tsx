@@ -7,12 +7,13 @@ interface NodeDetailsModalProps {
   onClose: () => void;
   nodes: Node[];
   edges: Edge[];
+  title: string;
 }
 
-const NodeDetailsModal = ({ visible, onClose, nodes, edges }: NodeDetailsModalProps) => {
+const NodeDetailsModal = ({ visible, onClose, nodes, edges, title }: NodeDetailsModalProps) => {
   return (
     <Modal
-      title="Node Details"
+      title={title}
       open={visible}
       onCancel={onClose}
       footer={null}

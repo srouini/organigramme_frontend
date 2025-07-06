@@ -2,6 +2,7 @@ import React, { createContext, useContext } from "react";
 import useUser from "@/hooks/references/useUser";
 import useGrade from "@/hooks/references/useGrade";
 import useOrganigrams from "@/hooks/references/useOrganigramsRef";
+import usePositions from "@/hooks/references/usePositions";
 
 
 const ReferenceContext = createContext<any>(null);
@@ -22,13 +23,15 @@ const ReferenceContextProvider = ({ children }: ReferenceContextProps) => {
   const user = useUser();
   const grades = useGrade();
   const organigrams = useOrganigrams();
+  const positions = usePositions();
   
 
   const contextValues = {
   
     user,
     grades,
-    organigrams
+    organigrams,
+    positions
   };
 
   return (

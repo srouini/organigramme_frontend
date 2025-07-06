@@ -1,3 +1,4 @@
+import { Position } from '@/types/reference';
 import React, {
   createContext,
   useCallback,
@@ -12,20 +13,29 @@ import {
   addEdge,
   applyEdgeChanges,
   applyNodeChanges,
-} from '@xyflow/react'
+} from '@xyflow/react';
+
+export type NodeData = {
+  position: Position;
+  isHighlighted?: boolean;
+};
+
+export type AppNode = Node<NodeData>;
 
 /** ---------- types ---------- */
 export type FlowCtx = {
-  nodes: Node[]
-  edges: Edge[]
-  setGraph: (nodes: Node[], edges: Edge[]) => void
-  onNodesChange: ReturnType<typeof createNodesChangeHandler>
-  onEdgesChange: ReturnType<typeof createEdgesChangeHandler>
-  onConnect: (c: Connection) => void
-  updateNode: (id: string, pos: { x: number; y: number }) => void
-  toggleCollapse: (id: string) => void
-  isCollapsed: (id: string) => boolean
-}
+  nodes: AppNode[];
+  edges: Edge[];
+  setGraph: (nodes: AppNode[], edges: Edge[]) => void;
+  onNodesChange: ReturnType<typeof createNodesChangeHandler>;
+  onEdgesChange: ReturnType<typeof createEdgesChangeHandler>;
+  onConnect: (c: Connection) => void;
+  updateNode: (id: string, pos: { x: number; y: number }) => void;
+  toggleCollapse: (id: string) => void;
+  isCollapsed: (id: string) => boolean;
+  searchNodes: (query: string | null, nodeId?: string | null) => void;
+  searchResults: string[];
+};
 
 const noop = () => {}
 const FlowContext = createContext<FlowCtx>({
@@ -38,15 +48,17 @@ const FlowContext = createContext<FlowCtx>({
   updateNode: noop,
   toggleCollapse: noop,
   isCollapsed: () => false,
+  searchNodes: () => {},
+  searchResults: [],
 })
 
 /** ---------- helpers ---------- */
 function createNodesChangeHandler(
-  setNodes: React.Dispatch<React.SetStateAction<Node[]>>,
+  setNodes: React.Dispatch<React.SetStateAction<AppNode[]>>,
   _edges: Edge[],
 ) {
   return (changes: Parameters<typeof applyNodeChanges>[0]) =>
-    setNodes((nds) => applyNodeChanges(changes, nds))
+    setNodes((nds) => applyNodeChanges(changes, nds) as AppNode[])
 }
 
 function createEdgesChangeHandler(
@@ -82,11 +94,12 @@ function getDescendants(rootId: string, edges: Edge[]): string[] {
 
 /** ---------- provider ---------- */
 export const FlowProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const [nodes, setNodes] = useState<Node[]>([])
+  const [nodes, setNodes] = useState<AppNode[]>([])
   const [edges, setEdges] = useState<Edge[]>([])
-  const [collapsed, setCollapsed] = useState<Set<string>>(new Set())
+  const [collapsed, setCollapsed] = useState<Set<string>>(new Set());
+  const [searchResults, setSearchResults] = useState<string[]>([]);
 
-  const setGraph = useCallback((nds: Node[], eds: Edge[]) => {
+  const setGraph = useCallback((nds: AppNode[], eds: Edge[]) => {
     setNodes(nds)
     setEdges(eds)
   }, [])
@@ -135,7 +148,38 @@ export const FlowProvider: React.FC<{ children: React.ReactNode }> = ({ children
     })
   }, [edges])
 
-  const isCollapsed = useCallback((id: string) => collapsed.has(id), [collapsed])
+  const isCollapsed = useCallback((id: string) => collapsed.has(id), [collapsed]);
+
+  const searchNodes = useCallback((query: string | null, nodeId?: string | null) => {
+    if (!query && !nodeId) {
+      setSearchResults([]);
+      setNodes((nds) =>
+        nds.map((n) => ({ ...n, data: { ...n.data, isHighlighted: false } }))
+      );
+      return;
+    }
+
+    let results: AppNode[] = [];
+    if (nodeId) {
+      results = nodes.filter((node) => node.id === nodeId);
+    } else if (query) {
+      results = nodes.filter((node) =>
+        node.data.position?.title.toLowerCase().includes(query.toLowerCase())
+      );
+    }
+    const resultIds = results.map((node) => node.id);
+    setSearchResults(resultIds);
+
+    setNodes((nds) =>
+      nds.map((n) => ({
+        ...n,
+        data: {
+          ...n.data,
+          isHighlighted: resultIds.includes(n.id),
+        },
+      }))
+    );
+  }, [nodes]);
 
   const value: FlowCtx = {
     nodes,
@@ -147,6 +191,8 @@ export const FlowProvider: React.FC<{ children: React.ReactNode }> = ({ children
     updateNode,
     toggleCollapse,
     isCollapsed,
+    searchNodes,
+    searchResults,
   }
 
   return <FlowContext.Provider value={value}>{children}</FlowContext.Provider>

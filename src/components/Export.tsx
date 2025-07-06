@@ -114,7 +114,6 @@ const Excel: React.FC<ExcelExportProps> = ({
 
       // Add date
       doc.setFontSize(10);
-      doc.text(`Generated using LOGIXFLOW on: ${new Date().toLocaleString()}`, margin, 25);
 
       autoTable(doc, {
         head: [header],

@@ -19,12 +19,18 @@ export const getColumns = (
     key: "abbreviation",
     dataIndex: "abbreviation",
   },
+  {
+    title: "Supérieur Hiérarchique",
+    key: "parent",
+    dataIndex: "parent",
+    render: (record:any) => renderText(record?.title)
+  },
     {
       title: "Title",
       key: "2",
       dataIndex: "title",
       width: 150,
-      render: (_, record: any) => <PositionDetails position={record} />,
+      render: (_, record: any) => <PositionDetails position={record} key={record?.id+"details_position"} />,
     },
     {
       title: "Grade",
@@ -167,81 +173,64 @@ export const columns = [
 
 export const exportColumns = [
   {
-    title: "Matricule",
-    dataIndex: "tc",
-    key: "tc",
+    title: "ABB",
+    key: "abbreviation",
+    dataIndex: "abbreviation",
     selected: true
   },
+  {
+    title: "Supérieur Hiérarchique",
+    key: "parent",
+    dataIndex: "parent",
+    selected: true,
+    schema: ["grade", "title"],
+  },
+    {
+      title: "Title",
+      key: "2",
+      dataIndex: "title",
+      selected: true
 
-  {
-    title: "Type",
-    key: "type_tc",
-    dataIndex: "type_tc",
-    schema: ["type_tc", "designation"],
-    selected: true
-  },
-  {
-    title: "Mrn",
-    key: "mrn",
-    dataIndex: "article",
-    schema: ["article", "gros", "gros"],
-    selected: true
-  },
-  {
-    title: "Accostage",
-    key: "mrn",
-    dataIndex: "article",
-    schema: ["article", "gros", "accostage"],
-    selected: true
-  },
-  {
-    title: "Article",
-    key: "article",
-    dataIndex: "article",
-    schema: ["article", "numero"],
-    selected: true
-  },
-  {
-    title: "Groupage",
-    key: "groupage",
-    dataIndex: "article",
-    schema: ["article", "groupage"],
-    selected: true
-  },
-  {
-    title: "Tar",
-    key: "tar",
-    dataIndex: "tar",
-    selected: true
-
-  },
-  {
-    title: "Poids",
-    key: "poids",
-    dataIndex: "poids",
-    selected: true
-
-  },
-  {
-    title: "Dangereux",
-    key: "dangereux",
-    dataIndex: "dangereux",
-    selected: true
-
-  },
-  {
-    title: "Frigo",
-    key: "frigo",
-    dataIndex: "frigo",
-    selected: true
-
-  },
-  {
-    title: "Facturé",
-    key: "billed",
-    dataIndex: "billed",
-    selected: true
-  },
+    },
+    {
+      title: "Grade",
+      key: "3",
+      dataIndex: "grade",
+      selected: true,
+      schema: ["grade", "name"],
+    },
+    {
+      title: "Categorie",
+      key: "34",
+      dataIndex: "category",
+      selected: true,
+      schema: ["grade", "category"],
+    },
+    {
+      title: "Quantité",
+      key: "8",
+      dataIndex: "quantity",
+      selected: true
+    },
+    {
+      title: "Formation",
+      key: "2",
+      dataIndex: "formation",
+      selected: true
+    }
+    ,
+    {
+      title: "Expérience",
+      key: "2",
+      dataIndex: "experience",
+      selected: true
+    },
+    {
+      title: "Missions principales",
+      key: "2",
+      dataIndex: "mission_principal",
+      selected: true
+    },
 ];
 
 export const DetailsColumns = [
