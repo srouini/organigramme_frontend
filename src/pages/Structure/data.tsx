@@ -2,8 +2,8 @@ import type { ProColumns, ProListProps } from "@ant-design/pro-components";
 import { TableDropdown } from "@ant-design/pro-components";
 import { Col, Popover, Row, Space, Tag, Tooltip } from "antd";
 import { getStatusColor, renderDate, renderDateTime, renderText } from "@/utils/functions";
-import { API_ORGANIGRAMMES_ENDPOINT } from "@/api/api";
-import SubArticlePage from "./OrganigramDetails";
+import { API_STRUCTURES_ENDPOINT } from "@/api/api";
+import SubArticlePage from "./StructureDetails";
 import Delete from "@/components/Delete";
 import AUForm from "./components/AUForm";
 import Print from "@/components/Print";
@@ -44,10 +44,10 @@ export const getMetas = (
         <Row gutter={8}>
           <Col>
             <Delete
-              url={API_ORGANIGRAMMES_ENDPOINT}
+              url={API_STRUCTURES_ENDPOINT}
               id={record.id}
               refetch={refetch}
-              class_name="Organigramme"
+              class_name="Structure"
               type="dashed"
               link={false}
               text=""
@@ -75,6 +75,12 @@ export const getColumns = (
       title: "Nom",
       dataIndex: "name",
       key: "1",
+      width: 100,
+    },
+    {
+      title: "Structure Parente",
+      dataIndex: ["parent", "name"],
+      key: "parent",
       width: 100,
     },
     {
@@ -111,10 +117,10 @@ export const getColumns = (
 
               <Col>
                 <Delete
-                  url={API_ORGANIGRAMMES_ENDPOINT}
+                  url={API_STRUCTURES_ENDPOINT}
                   id={record?.id}
                   refetch={refetch}
-                  class_name="Organigramme"
+                  class_name="Structure"
                   type="dashed"
                   link={false}
                   text=""

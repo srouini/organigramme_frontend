@@ -14,7 +14,7 @@ import {
 } from "@/utils/functions";
 import { selectConfig } from "@/utils/config";
 import { useReferenceContext } from "@/context/ReferenceContext";
-import { ORGANIGRAMME_STATES, YES_NO_CHOICES } from "@/utils/constants";
+import { STRUCTURE_STATES, YES_NO_CHOICES } from "@/utils/constants";
 import { Card } from "antd";
 
 type QueryFiltersProps = {
@@ -49,7 +49,7 @@ const QueryFilters: React.FC<QueryFiltersProps> = ({
         <ProFormSelect
           {...selectConfig}
           // @ts-ignore
-          options={ORGANIGRAMME_STATES}
+          options={STRUCTURE_STATES}
           label="Etat"
           name="state__icontains"
           mode="single"

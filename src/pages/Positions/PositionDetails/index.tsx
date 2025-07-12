@@ -53,7 +53,6 @@ export default ({ position, node=false }: PageProps) => {
     },
   });
 
-  console.log(missions)
   const {
     data: competences,
     isLoading: isLoadingCompetences,

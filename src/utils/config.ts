@@ -1,4 +1,4 @@
 export const selectConfig = {
-    allowClear: true,
-    showSearch: true,
-  };
+  allowClear: true,
+  showSearch: true,
+};

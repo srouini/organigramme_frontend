@@ -9,8 +9,8 @@ import Settings from './pages/Dashboard/Settings';
 import NotFoundPage from "./pages/NotFoundPage/Index";
 import GradesPage from './pages/Grades/index';
 import PositionsPage from './pages/Positions/index';
-import OrganigrammesPage from './pages/Organigramme/index';
-import OrganigrammesDetailsPage from './pages/Organigramme/OrganigramDetails/index';
+import OrganigrammesPage from './pages/Structure/index';
+import OrganigrammesDetailsPage from './pages/Structure/StructureDetails/index';
 const App = () => {
   return (
     <ConfigProvider
@@ -41,8 +41,8 @@ const App = () => {
           <Route path="/rotations/mrns" element={<GradesPage />} />
           <Route path="/grades" element={<GradesPage />} />
           <Route path="/positions" element={<PositionsPage />} />
-          <Route path="/organigrammes" element={<OrganigrammesPage />} />
-          <Route path="/organigrammes/:id" element={<OrganigrammesDetailsPage />} />
+          <Route path="/structures" element={<OrganigrammesPage />} />
+          <Route path="/structures/:id" element={<OrganigrammesDetailsPage />} />
           
         </Route>
 

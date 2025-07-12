@@ -4,7 +4,7 @@ import useLoading from "@/hooks/useLoading";
 import usePage from "@/hooks/usePage";
 import useFilters from "@/hooks/useFilters";
 import useData from "@/hooks/useData";
-import { API_ORGANIGRAMMES_ENDPOINT } from "@/api/api";
+import { API_STRUCTURES_ENDPOINT } from "@/api/api";
 import QueryFilters from "./components/QueryFilters";
 import CustomTable from "@/components/CustomTable";
 import { getMetas } from "./data";
@@ -31,14 +31,15 @@ export default () => {
     isFetching,
     refetch,
   } = useData({
-    endpoint: API_ORGANIGRAMMES_ENDPOINT,
-    name: `GET_ALL_ORGANIGRAMMES`,
+    endpoint: API_STRUCTURES_ENDPOINT,
+    name: `GET_ALL_STRUCTURES`,
     params: {
       search: search,
       page: page,
       page_size: getPageSize(),
       ...filters,
       ordering: "-id",
+      is_main: true,
     },
   });
 
@@ -59,17 +60,17 @@ export default () => {
     refetch();
   };
 
-  const { mutate } = usePost({
-    onSuccess: onSuccess,
-    endpoint: API_ORGANIGRAMMES_ENDPOINT + "bulk_update_type_tc/",
-  });
+  // const { mutate } = usePost({
+  //   onSuccess: onSuccess,
+  //   endpoint: API_STRUCTURES_ENDPOINT + "bulk_update_type_tc/",
+  // });
 
-  const handleContainerType = (values: any) => {
-    mutate({
-      ids: selectedRows,
-      type_tc_id: values,
-    });
-  };
+  // const handleContainerType = (values: any) => {
+  //   mutate({
+  //     ids: selectedRows,
+  //     type_tc_id: values,
+  //   });
+  // };
 
   const RowSelectionRnder = <></>;
 
@@ -79,9 +80,9 @@ export default () => {
     <PageContainer
       contentWidth="Fluid"
       header={{
-        title: "Organigrammes",
+        title: "Structures",
         extra: [
-          <AUForm refetch={refetch} addText="Organigramme" hasIcon />,
+          <AUForm refetch={refetch} addText="Structure" hasIcon />,
         ],
       }}
     >
@@ -96,7 +97,7 @@ export default () => {
         grid={{ gutter: 16, column: 4 }}
         data={data}
         onItem={(record) => ({
-          onClick: () => navigate(`/organigrammes/${record.id}`),
+          onClick: () => navigate(`/structures/${record.id}`),
           style: { cursor: 'pointer' },
         })}
         isFetching={isFetching}
@@ -108,7 +109,7 @@ export default () => {
         setPage={setPage}
         setPageSize={setPageSize}
         setSearch={setSearch}
-        key="ALL_ORGANIGRAMMES_TABLE"
+        key="ALL_STRUCTURES_TABLE"
       />
     </PageContainer>
   );

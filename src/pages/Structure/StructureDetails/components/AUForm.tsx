@@ -5,7 +5,8 @@ import { Divider, Form, message, Row } from "antd";
 import usePost from "../../../../hooks/usePost";
 import { mapInitialValues } from "../../../../utils/functions";
 import { useReferenceContext } from "../../../../context/ReferenceContext";
-import { API_ORGANIGRAMMES_ENDPOINT } from "@/api/api";
+import { API_STRUCTURES_ENDPOINT } from "@/api/api";
+
 import FormField from "@/components/form/FormField";
 import { YES_NO_CHOICES } from "@/utils/constants";
 import { EditOutlined, PlusOutlined } from "@ant-design/icons";
@@ -30,10 +31,7 @@ const AUForm: React.FC<AUFormProps> = ({
   const [form] = Form.useForm();
   const [open, setOpen] = useState(false);
 
-  const { organigrams } = useReferenceContext();
-
-
-  const {} = useReferenceContext();
+  const { structures, client, transitaire, box } = useReferenceContext();
 
   const handleFormSubmission = async () => {
     let values = await form.validateFields();
@@ -48,12 +46,12 @@ const AUForm: React.FC<AUFormProps> = ({
     message.success("Submission successful");
     setOpen(false);
     refetch();
-    organigrams?.refetch();
+    structures?.refetch();
   };
 
   const { mutate, isLoading } = usePost({
     onSuccess: onSuccess,
-    endpoint: API_ORGANIGRAMMES_ENDPOINT,
+    endpoint: API_STRUCTURES_ENDPOINT,
   });
 
   return (
@@ -86,7 +84,7 @@ const AUForm: React.FC<AUFormProps> = ({
             name="client"
             label="Client"
             type="select"
-            options={client?.results}
+            options={client?.data}
             option_label="raison_sociale"
             required
             span_md={24}
@@ -95,7 +93,7 @@ const AUForm: React.FC<AUFormProps> = ({
             name="transitaire"
             label="Transitaire"
             type="select"
-            options={transitaire?.results}
+            options={transitaire?.data}
             option_label="raison_sociale"
             option_value="id"
             disabled
@@ -134,7 +132,7 @@ const AUForm: React.FC<AUFormProps> = ({
             name="box"
             label="Box"
             type="select"
-            options={box?.results}
+            options={box?.data}
             option_label="designation"
             span_md={24}
           />

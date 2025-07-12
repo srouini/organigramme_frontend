@@ -1,6 +1,5 @@
 import { useEffect, useState } from "react";
 import useData from "../useData";
-import { Profile } from "@/types/reference";
 import { API_GRADES_ENDPOINT } from "@/api/api";
 import { Grade } from "@/types/reference";
 
@@ -19,7 +18,7 @@ const useGrade = (): UseGradeResult => {
       endpoint: API_GRADES_ENDPOINT,
       name: "GET_GRADES",
       enabled: false,
-      params: { all: true },
+      params: { all: true,fields:"id,name" },
     });
 
     const fetch = () => {
@@ -28,8 +27,10 @@ const useGrade = (): UseGradeResult => {
       }
     };
 
+
     useEffect(() => {
       setResults(data?.data);
+      console.log(data)
     }, [data]);
 
     return { 

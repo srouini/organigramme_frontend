@@ -1,16 +1,15 @@
 import { memo } from 'react';
 import type { EdgeProps } from '@xyflow/react';
-import { useQueryClient } from '@tanstack/react-query';
+
 import { Modal, message, Button } from 'antd';
 import { Trash2 } from 'lucide-react';
 import { ButtonEdge } from './button-edge';
-import { useDeleteEdge } from '../hooks/useOrganigram';
+import { useDeleteEdge } from '../hooks/useStructure';
 
 const CustomButtonEdge = (props: EdgeProps) => {
   const { id, data, selected } = props;
-  const organigramId = (data as { organigramId?: string })?.organigramId || '';
-  const { mutate: deleteEdge } = useDeleteEdge();
-  const queryClient = useQueryClient();
+  const structureId = (data as { structureId?: string })?.structureId || '';
+  const { mutate: deleteEdge } = useDeleteEdge(structureId);
   const { confirm } = Modal;
 
   const showConfirm = () => {
@@ -23,13 +22,10 @@ const CustomButtonEdge = (props: EdgeProps) => {
       onOk() {
         return new Promise((resolve, reject) => {
           deleteEdge(
-            { edgeId: id, organigramId },
+            { id },
             {
               onSuccess: () => {
                 message.success('Connexion supprimée avec succès');
-                queryClient.invalidateQueries({
-                  queryKey: ['organigram', organigramId],
-                });
                 resolve(true);
               },
               onError: (error: any) => {

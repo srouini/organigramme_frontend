@@ -38,15 +38,15 @@ const AUForm: React.FC<AUFormProps> = ({
   const [form] = Form.useForm();
   const [open, setOpen] = useState(false);
 
-  const { grades, organigrams, positions } = useReferenceContext();
+  const { grades, structures, positions } = useReferenceContext();
 
-  useEffect(() => {
-    grades.fetch();
-    organigrams.fetch();
-    positions.fetch();
-  }, []);
 
-  const { } = useReferenceContext();
+useEffect(()=>{
+  grades?.fetch();
+  structures?.fetch();
+  positions?.fetch();
+},[])
+
 
   const handleFormSubmission = async () => {
     let values = await form.validateFields();
@@ -71,6 +71,7 @@ const AUForm: React.FC<AUFormProps> = ({
 
   const hasPermission = usePermissions();
 
+
   return (
     <DraggableModel
       OkButtontext="Submit"
@@ -92,10 +93,10 @@ const AUForm: React.FC<AUFormProps> = ({
         <Row gutter={24}>
 
           <FormField
-            name="organigram"
-            label="Organigramme"
+            name="structure"
+            label="Structure"
             type="select"
-            options={organigrams?.results}
+            options={structures?.results}
             option_label="name"
             required
             span_md={24}

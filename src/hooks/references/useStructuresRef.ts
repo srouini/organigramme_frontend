@@ -1,24 +1,24 @@
 import { useEffect, useState } from "react";
 import useData from "../useData";
-import {  API_ORGANIGRAMMES_ENDPOINT } from "@/api/api";
-import { Organigram } from "@/types/reference";
+import { API_STRUCTURES_ENDPOINT } from "@/api/api";
+import { Structure } from "@/types/reference";
 
-interface UseOrganigramsResult {
-  results: Organigram[] | undefined;
+interface UseStructuresResult {
+  results: Structure[] | undefined;
   isLoading: boolean;
   isRefetching: boolean;
   fetch: () => void;
   refetch: () => void;
 }
 
-const useOrganigramsRef = (): UseOrganigramsResult => {
-    const [results, setResults] = useState<Organigram[]>();
+const useStructuresRef = (): UseStructuresResult => {
+    const [results, setResults] = useState<Structure[]>();
 
     const { data, isLoading, isRefetching, refetch } = useData({
-      endpoint: API_ORGANIGRAMMES_ENDPOINT,
-      name: "GET_ORGANIGRAMS",
+      endpoint: API_STRUCTURES_ENDPOINT,
+      name: "GET_STRUCTURES",
       enabled: false,
-      params: { all: true },
+      params: { all: true,fields:"id,name" },
     });
 
     const fetch = () => {
@@ -40,4 +40,4 @@ const useOrganigramsRef = (): UseOrganigramsResult => {
     };
 };
 
-export default useOrganigramsRef;
+export default useStructuresRef;

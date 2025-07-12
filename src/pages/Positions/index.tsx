@@ -16,11 +16,6 @@ import Export from "./components/Export";
 import AUForm from "./components/AUForm";
 
 export default () => {
-  const { containerType } = useReferenceContext();
-
-  useEffect(() => {
-    containerType?.fetch();
-  }, []);
 
   const [search, setSearch] = useState("");
   const { page, getPageSize, setPageSize, setPage } = usePage();
@@ -49,42 +44,7 @@ export default () => {
     loadingStates: [isLoadingData, isRefetching, isFetching],
   });
 
-  const [selectedRows, setSelectedRows] = useState<React.Key[]>([]);
-  const rowSelectionFunction: TableSelectionType = {
-    // @ts-ignore
-    onChange(selectedRowKeys, selectedRows, info) {
-      setSelectedRows(selectedRowKeys);
-    },
-  };
-
-  const onSuccess = () => {
-    message.success("Submission successful");
-    refetch();
-  };
-
-  const { mutate } = usePost({
-    onSuccess: onSuccess,
-    endpoint: API_POSITIONS_ENDPOINT + "bulk_update_type_tc/",
-  });
-
-  const handleContainerType = (values: any) => {
-    mutate({
-      ids: selectedRows,
-      type_tc_id: values,
-    });
-  };
-
-  const RowSelectionRnder = (
-    <>
-      Type:
-      <Segmented
-        options={containerType?.results}
-        onChange={handleContainerType}
-        allowFullScreen
-        defaultValue={false}
-      />
-    </>
-  );
+  
 
   return (
     <PageContainer

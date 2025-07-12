@@ -23,7 +23,7 @@ export const YES_NO_CHOICES = [
   }
 ];
 
-export const ORGANIGRAMME_STATES = [
+export const STRUCTURE_STATES = [
   {
     value: "Draft",
     label: "Brouillon",

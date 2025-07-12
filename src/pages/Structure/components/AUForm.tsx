@@ -5,9 +5,9 @@ import { Divider, Form, message, Row } from "antd";
 import usePost from "@/hooks/usePost";
 import { mapInitialValues } from "@/utils/functions";
 import { useReferenceContext } from "@/context/ReferenceContext";
-import { API_ORGANIGRAMMES_ENDPOINT } from "@/api/api";
+import { API_STRUCTURES_ENDPOINT } from "@/api/api";
 import FormField from "@/components/form/FormField";
-import { ORGANIGRAMME_STATES, YES_NO_CHOICES } from "@/utils/constants";
+import { STRUCTURE_STATES, YES_NO_CHOICES } from "@/utils/constants";
 import { EditOutlined, PlusOutlined } from "@ant-design/icons";
 import { usePermissions } from "@/utils/permissions";
 
@@ -37,8 +37,11 @@ const AUForm: React.FC<AUFormProps> = ({
   const [form] = Form.useForm();
   const [open, setOpen] = useState(false);
 
-  const { organigrams } = useReferenceContext();
+  const { structures } = useReferenceContext();
 
+  useEffect(() => {
+    structures?.fetch();
+  },[])
   const handleFormSubmission = async () => {
     let values = await form.validateFields();
     if (initialvalues) {
@@ -52,26 +55,27 @@ const AUForm: React.FC<AUFormProps> = ({
     message.success("Submission successful");
     setOpen(false);
     refetch();
-    organigrams?.refetch();
+    structures?.refetch();
   };
 
   const { mutate, isLoading } = usePost({
     onSuccess: onSuccess,
-    endpoint: API_ORGANIGRAMMES_ENDPOINT,
+    endpoint: API_STRUCTURES_ENDPOINT,
   });
 
   const hasPermission = usePermissions();
 
+  console.log(structures?.results)
   return (
     <DraggableModel
       OkButtontext="Sumettre"
       modalOpenButtonText={initialvalues ? editText : addText} 
-      modalTitle="Organigramme"
+      modalTitle="Structure"
       addButtonType="dashed"
       addButtonIcon={
         hasIcon && initialvalues ? <EditOutlined /> : <PlusOutlined />
       }
-      disabledModalOpenButton={disabled || (!initialvalues && !hasPermission('app.add_tc')) || (initialvalues && !hasPermission('app.change_tc'))}
+      disabledModalOpenButton={disabled || (!initialvalues && !hasPermission('structure.add_structure')) || (initialvalues && !hasPermission('structure.change_structure'))}
       onSubmit={handleFormSubmission}
       setOpen={setOpen}
       open={open}
@@ -79,7 +83,7 @@ const AUForm: React.FC<AUFormProps> = ({
       isLoading={isLoading}
       initialvalues={initialvalues}
     >
-      <FormObject form={form} initialvalues={mapInitialValues(initialvalues)}>
+      <FormObject form={form} >
         <Row gutter={24}>
           <FormField
             name="name"
@@ -88,12 +92,22 @@ const AUForm: React.FC<AUFormProps> = ({
             required
             span_md={24}
           />
-          <Divider style={{ marginTop: "0px" }} />
           <FormField
-            name="state"
-            label="Etat"
+            name="parent"
+            label="Structure Parente"
             type="select"
-            options={ORGANIGRAMME_STATES}
+            options={structures?.results}
+            option_label="name"
+            option_value="id"
+            span_md={24}
+          />
+          <Divider style={{ marginTop: "0px" }} />
+          
+          <FormField
+            name="is_main"
+            label="Structure Principale"
+            type="select"
+            options={YES_NO_CHOICES}
             required
             option_value="value"
             span_md={24}

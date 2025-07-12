@@ -69,12 +69,12 @@ const LoginPage: React.FC = () => {
 
       <Row style={{ marginBottom: "10px", display: "flex", justifyContent:"left" }}>
         <div style={{ textAlign: "left", outline: "none", fontSize:"11pt", fontWeight:"light" }}>
-          Welcome to <b style={{color:"#968b6a" }}>Organigramme</b>,
+          Welcome to <b style={{color:"#968b6a" }}>Structure</b>,
         </div>
       </Row>
       <Row style={{ marginBottom: "40px", display: "flex", justifyContent:"left" }}>
         <div style={{ textAlign: "left", outline: "none", fontSize:"11pt", fontWeight:"light" }}>
-          Organigrammes made easy.
+          Structures made easy.
         </div>
       </Row>
       <Row style={{ width: "100%", maxWidth: "350px" }}>

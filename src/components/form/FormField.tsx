@@ -121,21 +121,36 @@ const FormField: React.FC<FormFieldProps> = ({
       return (
         <Col span={span} md={span_md}>
           <ProFormSelect
-          style={{width:`${span_md === 24 ? "100%" : ""}`}}
+            style={{width:`${span_md === 24 ? "100%" : ""}`}}
             {...selectConfig}
             width="lg"
             onChange={onChange}
-            options={options}
+            options={options?.map(option => {
+              // Handle case where option is already in the correct format
+              if (option.value !== undefined && option.label !== undefined) {
+                return option;
+              }
+              // Handle structure/object with id and name properties
+              const label = option[option_label || 'name'] || option.name || option.label || option.id;
+              const value = option[option_value || 'id'] || option.value || option.id;
+              return {
+                ...option,
+                label,
+                value,
+                key: value // Ensure each option has a unique key
+              };
+            })}
             initialValue={initialValue}
             label={label}
             required={required}
             name={name}
             disabled={disabled}
             fieldProps={{
-              fieldNames: { label: option_label, value: option_value },
-              maxTagCount: 'responsive',
-              defaultValue:defaultValue,
-              allowClear,
+              showSearch: true,
+              optionFilterProp: 'label',
+              filterOption: (input, option) =>
+                (option?.label ?? '').toLowerCase().includes(input.toLowerCase().trim()),
+              allowClear: true
             }}
             placeholder={placeholder}
             rules={rules}

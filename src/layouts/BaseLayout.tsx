@@ -1,4 +1,4 @@
-import { LogoutOutlined, MoonOutlined, SettingOutlined, SunOutlined, WindowsOutlined, BranchesOutlined, FileProtectOutlined, FieldTimeOutlined, FileDoneOutlined, CodepenOutlined, SlidersOutlined, ArrowRightOutlined } from "@ant-design/icons";
+import { LogoutOutlined, MoonOutlined, SettingOutlined, SunOutlined, WindowsOutlined, BranchesOutlined, FileProtectOutlined, FieldTimeOutlined, FileDoneOutlined, CodepenOutlined, SlidersOutlined, ArrowRightOutlined, ApartmentOutlined } from "@ant-design/icons";
 import { MenuDataItem, ProConfigProvider, ProLayout } from "@ant-design/pro-components";
 import { Col, ConfigProvider, Dropdown, message, Modal, Row, theme, Select, Button, Space } from "antd";
 import { useEffect, useState, useCallback } from "react";
@@ -194,22 +194,20 @@ export default () => {
         icon: <WindowsOutlined />,
       },
       {
-        path: '/organigrammes',
-        name: 'Organigrammes',
-        icon: <CodepenOutlined />,
+        path: '/structures',
+        name: 'Structures',
+        icon: <ApartmentOutlined />,
       },
-      ,
       {
         path: '/grades',
         name: 'Grades',
         icon: <CodepenOutlined />,
       },
-      ,
       {
         path: '/positions',
         name: 'Positions',
         icon: <CodepenOutlined />,
-      },    
+      },
     ];
   };
 

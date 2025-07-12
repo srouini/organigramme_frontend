@@ -7,7 +7,8 @@ import ProtectedRoute from './components/_ProtectedRoute';
 import NotFoundPage from "./pages/NotFoundPage/Index"
 import GradesPage from './pages/Grades/index';
 import PositionsPage from './pages/Positions/index';
-import OrganigrammesDetailsPage from './pages/Organigramme/OrganigramDetails/index';
+import StructurePage from './pages/Structure/index';
+import StructureDetailsPage from './pages/Structure/StructureDetails/index';
 
 
 
@@ -21,8 +22,8 @@ const AppRoutes = () => (
         <Route path="/dashboard/settings" element={<Settings />} />
         <Route path="/grades" element={<GradesPage />} />
         <Route path="/positions" element={<PositionsPage />} />
-        <Route path="/organigrammes" element={<OrganigrammesPage />} />
-        <Route path="/organigrammes/:id" element={<OrganigrammesDetailsPage />} />
+        <Route path="/structures" element={<StructurePage />} />
+        <Route path="/structures/:id" element={<StructureDetailsPage />} />
       </Route>
 
       <Route path="*" element={<NotFoundPage />} />

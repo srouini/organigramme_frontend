@@ -1,8 +1,11 @@
 import type { NodeProps } from '@xyflow/react';
-import type { Position as PositionType } from '@/types/reference';
+import type { Position as PositionType, Structure as StructureType } from '@/types/reference';
 
 export interface CustomNodeData {
-  position: PositionType;
+  type: 'position' | 'structure';
+  data: PositionType | StructureType;
+  position: PositionType; // Required by FlowContext, mocked for structures
+  isHighlighted?: boolean;
   isModalView?: boolean;
   [key: string]: any; // Allow additional properties
 }

@@ -35,12 +35,9 @@ const QueryFilters: React.FC<QueryFiltersProps> = ({
   };
 
 
-  const { grades,organigrams } = useReferenceContext();
+  const { grades, structures } = useReferenceContext();
 
-  useEffect(() => {
-    grades.fetch();
-    organigrams.fetch();
-  }, []);
+
 
   return (
     <Card style={{ marginBottom: "20px" }}>
@@ -70,17 +67,17 @@ const QueryFilters: React.FC<QueryFiltersProps> = ({
         />
         <ProFormSelect
           {...selectConfig}
-          options={organigrams?.results}
-          label="Organigramme"
+          options={structures?.data}
+          label="Structure"
           labelCol={{ span: 6 }}
-          name="organigram__in"
+          name="structure__in"
           fieldProps={{
             fieldNames: { label: "name", value: "id" },
             maxTagCount: 'responsive',
           }}
           mode="multiple"
           transform={(value) =>
-            transformSelectFilter("multiple", "organigram", value)
+            transformSelectFilter("multiple", "structure", value)
           }
         />
 
