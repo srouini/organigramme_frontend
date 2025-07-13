@@ -22,6 +22,7 @@ import { BaseModel } from "./commun";
     children?: Structure[];
     positions?: Position[];
     edges?: StructureEdge[];
+    manager?: Position;
     diagram_positions?: DiagramPosition[];
   }
 

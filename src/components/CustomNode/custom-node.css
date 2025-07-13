@@ -6,26 +6,26 @@
   font-weight: bold;
   border-radius: 4px;
 }
-‡
+
 .custom-handle {
   width: 20px !important;
-  height: 8px !important;
+  height: 10px !important;
   background: white !important;
-  border: 2px solid #555 !important;
-  border-radius: 20px !important;
+  border: 2px solid #456882 !important;
+  border-radius: 8px !important;
   z-index: 10 !important;
 }
 
 /* Position the top handle */
 .custom-handle[data-handlepos="top"] {
-  top: -8px !important;
+  top: -5px !important;
   left: 50% !important;
   transform: translateX(-50%) !important;
 }
 
 /* Position the bottom handle */
 .custom-handle[data-handlepos="bottom"] {
-  bottom: -8px !important;
+  bottom: -5px !important;
   left: 50% !important;
   transform: translateX(-50%) !important;
 }

@@ -74,7 +74,7 @@ export default ({ position, node=false }: PageProps) => {
   return (
     <>
       {!node && <Button onClick={showDrawer} type="link">{position?.title}</Button>}
-      {node && <Button onClick={showDrawer} style={{position: 'absolute', bottom: '10px', right: '10px'}}  icon={<FileProtectOutlined />}></Button>}
+      {node && <Button onClick={showDrawer}  icon={<FileProtectOutlined />}></Button>}
 
       <Drawer
         width={node ? 800 : 1000}

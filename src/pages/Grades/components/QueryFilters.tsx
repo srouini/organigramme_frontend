@@ -1,20 +1,8 @@
 import {
-  ProFormDatePicker,
-  ProFormDateRangePicker,
   ProFormDigit,
-  ProFormSelect,
   ProFormText,
   QueryFilter,
 } from "@ant-design/pro-components";
-import { useEffect } from "react";
-
-import {
-  transformRangeDateFilter,
-  transformSelectFilter,
-} from "@/utils/functions";
-import { selectConfig } from "@/utils/config";
-import { useReferenceContext } from "@/context/ReferenceContext";
-import { ORGANIGRAMME_STATES, YES_NO_CHOICES } from "@/utils/constants";
 import { Card } from "antd";
 
 type QueryFiltersProps = {
@@ -44,8 +32,8 @@ const QueryFilters: React.FC<QueryFiltersProps> = ({
         style={{ padding: "0px" }}
         defaultCollapsed={collapsed}
       >
-        <ProFormText name="name__icontains" label="Nom" />
-        <ProFormDigit name="level" label="Niveau" />
+        <ProFormText name="name__icontains" label="Grade" />
+        <ProFormText name="category__icontains" label="Categorie" />
 
         
 

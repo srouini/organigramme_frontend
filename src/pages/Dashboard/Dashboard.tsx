@@ -56,7 +56,7 @@ export default () => {
           width: `${isMobile ? "100%" : "50%"}`,
           padding: "8px",
         }}>
-          {hasPagePermission("/organigrammes") && <Button onClick={() => navigate("/organigrammes")} block={isMobile}>Organigrammes</Button>}
+          {hasPagePermission("/structures") && <Button onClick={() => navigate("/structures")} block={isMobile}>Structures</Button>}
           {hasPagePermission("/grades") && <Button onClick={() => navigate("/grades")} block={isMobile}>Grades</Button>}
           {hasPagePermission("/positions") && <Button onClick={() => navigate("/positions")} block={isMobile}>Positions</Button>}
 

@@ -48,10 +48,10 @@ const CustomNode: FC<CustomNodeProps> = ({ data, id, selected }) => {
     boxShadow: data.isHighlighted
       ? '0 4px 12px rgba(255, 77, 79, 0.5)'
       : selected
-      ? '0 4px 12px rgba(24, 144, 255, 0.3)'
-      : isHovered
-      ? '0 6px 16px rgba(0, 0, 0, 0.1)'
-      : 'none',
+        ? '0 4px 12px rgba(24, 144, 255, 0.3)'
+        : isHovered
+          ? '0 6px 16px rgba(0, 0, 0, 0.1)'
+          : 'none',
     transform: isHovered ? 'translateY(-2px)' : 'none',
     transition: 'all 0.3s ease',
     cursor: 'pointer',
@@ -81,39 +81,44 @@ const CustomNode: FC<CustomNodeProps> = ({ data, id, selected }) => {
         onMouseEnter={() => setIsHovered(true)}
         onMouseLeave={() => setIsHovered(false)}
       >
-        <Tooltip title="View details" placement="top">
-          <Button
-            type="default"
-            icon={<ExpandAltOutlined />}
-            onClick={handleExpandClick}
-            style={{ position: 'absolute', bottom: '10px', right: '46px', zIndex: 10 }}
-          />
-        </Tooltip>
+
         <div role="button" tabIndex={0}>
           {!position.initial_node && (
             <Handle type="target" position={HandlePosition.Top} className="custom-handle" />
           )}
           <Row gutter={16}>
-            <Col span={6}>
+            <Col>
               <Flex justify="center" align="center" style={{ height: '100%' }}>
                 <Badge count={position.quantity}>
                   <Avatar shape="square" icon={<UserOutlined />} size={40} style={{ backgroundColor: position.grade?.color }} />
                 </Badge>
               </Flex>
             </Col>
-            <Col span={18}>
+            <Col style={{ marginLeft: "8px", display: 'flex', flexDirection: 'column', alignItems: 'start', justifyContent: 'center' }}>
               <div style={{ textAlign: 'left', marginBottom: '8px', fontWeight: 500, color: '#333' }}>
                 {position.title}
               </div>
-              <Flex justify="left" align="start" style={{ height: '100%' }}>
+              <Flex justify="left" align="start">
                 <Tag style={positionNodeStyles.tag}>{position.grade?.name}</Tag>
               </Flex>
             </Col>
+            <Col>
+              <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: '6px' }}>
+                <Tooltip title="View details" placement="top">
+                  <Button
+                    type="default"
+                    icon={<ExpandAltOutlined />}
+                    onClick={handleExpandClick}
+                  />
+                </Tooltip>
+                <PositionDetails position={position} node={true} />
+              </div>
+            </Col>
           </Row>
+          <NodeDetailsModal visible={showDetails} onClose={handleCloseModal} nodes={detailNodes} edges={detailEdges} title={modalTitle} />
+
           <Handle type="source" position={HandlePosition.Bottom} className="custom-handle" />
-          <PositionDetails position={position} node={true} />
         </div>
-        <NodeDetailsModal visible={showDetails} onClose={handleCloseModal} nodes={detailNodes} edges={detailEdges} title={modalTitle} />
       </div>
     );
 
@@ -124,12 +129,82 @@ const CustomNode: FC<CustomNodeProps> = ({ data, id, selected }) => {
   };
 
   const renderStructureNode = (structure: Structure) => {
+    const managerGradeColor = structure.manager?.grade?.color || '#1890ff';
+
     const structureNodeStyles = {
       card: {
         ...baseCardStyle,
         backgroundColor: '#f0f2f5',
         borderColor: data.isHighlighted ? '#ff4d4f' : (selected ? '#1890ff' : '#d9d9d9'),
         flexDirection: 'column' as const,
+        padding: '16px 12px',
+        minWidth: '250px',
+        position: 'relative' as const,
+      },
+      managerContainer: {
+        marginTop: '12px',
+        padding: '10px 10px 10px 10px',
+        backgroundColor: 'white',
+        borderRadius: '6px',
+        borderLeft: `3px solid ${managerGradeColor}`,
+        position: 'relative' as const,
+        cursor: 'pointer',
+        transition: 'all 0.2s ease',
+        '&:hover': {
+          backgroundColor: '#f9f9f9',
+          '&::after': {
+            backgroundColor: '#f0f0f0',
+          },
+        },
+        '&::after': {
+          content: '""',
+          position: 'absolute',
+          right: 0,
+          top: 0,
+          bottom: 0,
+          width: '30px',
+          borderTopRightRadius: '6px',
+          borderBottomRightRadius: '6px',
+          transition: 'background-color 0.2s ease',
+        },
+      },
+      managerHeader: {
+        display: 'flex',
+        justifyContent: 'space-between',
+      },
+      managerContent: {
+        flex: 2,
+        display:'flex',
+        gap:'15px', 
+      },
+      managerName: {
+        fontSize: '12px',
+        fontWeight: 500,
+        color: '#333',
+        marginBottom: '4px',
+      },
+      gradeBadge: {
+        backgroundColor: `${managerGradeColor}20`,
+        color: managerGradeColor,
+        border: `1px solid ${managerGradeColor}40`,
+        borderRadius: '4px',
+        padding: '0 6px',
+        fontSize: '10px',
+        fontWeight: 500,
+        display: 'inline-block',
+      },
+      detailsButton: {
+        position: 'absolute' as const,
+        bottom: '4px',
+        right: '4px',
+        background: 'transparent',
+        border: 'none',
+        padding: '2px',
+        cursor: 'pointer',
+        color: '#666',
+        '&:hover': {
+          color: '#1890ff',
+        },
       },
     };
 
@@ -140,10 +215,53 @@ const CustomNode: FC<CustomNodeProps> = ({ data, id, selected }) => {
         onMouseEnter={() => setIsHovered(true)}
         onMouseLeave={() => setIsHovered(false)}
       >
-        <Handle type="target" position={HandlePosition.Top} className="custom-handle" />
-        <ApartmentOutlined style={{ fontSize: '24px', color: '#1890ff' }} />
-        <Title level={5} style={{ marginTop: '8px', textAlign: 'center' }}>{structure.name}</Title>
-        <Handle type="source" position={HandlePosition.Bottom} className="custom-handle" />
+        {/* Top handle for incoming connections */}
+        <div style={{ position: 'absolute', top: 0, left: '50%', transform: 'translateX(-50%)', zIndex: 10 }}>
+          <Handle 
+            type="target" 
+            position={HandlePosition.Top} 
+            className="custom-handle"
+            style={{ position: 'relative', top: '-5px' }}
+          />
+        </div>
+        
+        {/* Main content */}
+        <div style={{ pointerEvents: 'none' }}>
+          <ApartmentOutlined style={{ fontSize: '24px', color: '#1890ff' }} />
+          <Title level={5} style={{ margin: '8px 0', textAlign: 'center' }}>{structure.name}</Title>
+        </div>
+
+        {structure.manager && (
+          <div style={{ ...structureNodeStyles.managerContainer, pointerEvents: 'none' }}>
+            <div style={structureNodeStyles.managerContent}>
+              <div>
+                <div style={structureNodeStyles.managerName}>
+                  {structure.manager.title}
+                </div>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                  {structure.manager.grade && (
+                    <div style={structureNodeStyles.gradeBadge}>
+                      {structure.manager.grade.name}
+                    </div>
+                  )}
+                </div>
+              </div>
+              <div style={{ pointerEvents: 'auto' }}>
+                <PositionDetails position={structure.manager} node={true} />
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Bottom handle for outgoing connections */}
+        <div style={{position: 'absolute', bottom: 0, left: '50%', transform: 'translateX(-50%)', zIndex: 10 }}>
+          <Handle 
+            type="source" 
+            position={HandlePosition.Bottom} 
+            className="custom-handle"
+            style={{ position: 'relative', bottom: '-5px' }}
+          />
+        </div>
       </div>
     );
   };

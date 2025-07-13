@@ -141,20 +141,51 @@ export default () => {
       return position || { x: defaultX, y: defaultY };
     };
 
-    const positionNodes = (data.positions || []).map((p: Position, index: number) => {
-      const position = getNodePosition('position', p.id.toString(), index * 200, 100);
-      
-      return {
-        type: 'custom',
-        id: `position-${p.id}`,
-        position,
-        data: {
-          position: p,
-          type: 'position',
-          data: p,
-        },
-      };
-    });
+    // Log manager and positions data for debugging
+    const currentManagerId = typeof data.manager === 'number' ? data.manager : data.manager?.id;
+    console.log('Current structure manager:', data.manager);
+    console.log('Current structure manager_id:', currentManagerId);
+    console.log('All positions:', data.positions);
+    console.log('Child structures:', data.children?.map((c: Structure) => ({
+      id: c.id,
+      name: c.name,
+      manager: c.manager
+    })));
+
+    // Filter out positions that are managers of any structure (current or children)
+    const positionNodes = (data.positions || [])
+      .filter((p: Position) => {
+        // Check if this position is the manager of the current structure
+        const isCurrentManager = currentManagerId === p.id;
+        
+        // Check if this position is a manager of any child structure
+        const isChildManager = data.children?.some((s: Structure) => {
+          const childManagerId = typeof s.manager === 'number' ? s.manager : s.manager?.id;
+          return childManagerId === p.id;
+        }) || false;
+        
+        // Log filtering decision
+        if (isCurrentManager || isChildManager) {
+          console.log(`Filtering out position ${p.id} (${p.title}) - isCurrentManager: ${isCurrentManager}, isChildManager: ${isChildManager}`);
+        }
+        
+        // Only include positions that are not managers of any structure
+        return !(isCurrentManager || isChildManager);
+      })
+      .map((p: Position, index: number) => {
+        const position = getNodePosition('position', p.id.toString(), index * 200, 100);
+        
+        return {
+          type: 'custom',
+          id: `position-${p.id}`,
+          position,
+          data: {
+            position: p,
+            type: 'position',
+            data: p,
+          },
+        };
+      });
 
     // Add parent structure node if exists
     const parentNode = parentData ? [{
@@ -501,7 +532,7 @@ export default () => {
                 edges={edges}
                 onNodesChange={onNodesChange}
                 onEdgesChange={onEdgesChange}
-                onConnect={handleConnect}
+                onConnect={onConnect}
                 onNodeDragStop={onNodeDragStop}
                 nodeTypes={nodeTypes}
                 edgeTypes={edgeTypes}
@@ -515,6 +546,9 @@ export default () => {
                 maxZoom={2}
                 defaultViewport={{ x: 0, y: 0, zoom: 1 }}
                 proOptions={{ hideAttribution: true }}
+                nodesConnectable={true}
+                edgesUpdatable={true}
+                elementsSelectable={true}
               >
               <Background />
               <Controls />

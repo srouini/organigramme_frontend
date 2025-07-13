@@ -103,15 +103,7 @@ const AUForm: React.FC<AUFormProps> = ({
           />
           <Divider style={{ marginTop: "0px" }} />
         </Row>
-      
-   
-          <FormField
-            label="Niveau"
-            name="level"
-            type="number"
-            required
-            span_md={24}
-          />
+    
                <FormField
             name="category"
             label="Categorie"

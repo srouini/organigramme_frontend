@@ -44,8 +44,9 @@ export const useStructure = (id: string) => {
     queryKey: ['structure', id],
     queryFn: async () => {
       const { data } = await axios.get<Structure>(
-        `${API_STRUCTURES_ENDPOINT}${id}/?expand=positions.grade,edges,children,parent`
+        `${API_STRUCTURES_ENDPOINT}${id}/?expand=positions.grade,edges,children,parent,manager,manager.grade`
       )
+      console.log('Structure data with manager:', data);
       return data
     },
     enabled: Boolean(id), // don’t fire on undefined
@@ -129,7 +130,10 @@ export const useCreateEdge = (structureId: string) => {
   return useMutation<OrganigramEdge, Error, EdgeCreatePayload>({
     mutationFn: (payload) =>
       axios
-        .post<OrganigramEdge>(`${API_STRUCTURES_ENDPOINT}${structureId}/edges/`, payload)
+        .post<OrganigramEdge>(`${API_EDGES_ENDPOINT}`, {
+          ...payload,
+          structure: structureId
+        })
         .then((r) => r.data),
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ['structure', structureId] })

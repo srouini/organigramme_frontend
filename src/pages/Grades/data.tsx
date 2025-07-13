@@ -17,12 +17,6 @@ export const getColumns = (
       render: (_,record: any) => <><Badge color={record?.color} style={{ marginRight:"5px"}}/> {record?.name}</>
     },
     {
-      title: "Niveau",
-      key: "2",
-      dataIndex: "level",
-      render: (_,record: any) => <Tag color={record?.color ? record?.color : "blue"}> {record?.level} </Tag>,
-    },
-    {
       title: "Categorie",
       key: "34",
       dataIndex: "category",
