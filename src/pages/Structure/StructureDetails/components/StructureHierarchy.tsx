@@ -31,6 +31,9 @@ const StructureHierarchy: React.FC<StructureHierarchyProps> = ({
 
   const treeData = data ? [convertToTreeData(data)] : [];
   const parentId = data?.parent ? (typeof data.parent === 'object' ? data.parent.id : data.parent) : undefined;
+  
+  // Get the keys of the first level nodes to expand them by default
+  const defaultExpandedKeys = treeData.length > 0 ? [treeData[0].key] : [];
 
   return (
   
@@ -40,7 +43,8 @@ const StructureHierarchy: React.FC<StructureHierarchyProps> = ({
         treeData={treeData}
         onSelect={onSelect}
         selectedKeys={currentStructureId ? [currentStructureId] : []}
-        style={{  backgroundColor:"#FBFBFB"}}
+        defaultExpandedKeys={defaultExpandedKeys}
+        style={{ backgroundColor: "#FBFBFB" }}
       />
 
   );
