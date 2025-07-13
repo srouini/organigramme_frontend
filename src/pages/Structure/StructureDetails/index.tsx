@@ -27,6 +27,7 @@ import SearchControl from "./components/SearchControl";
 import CustomNode from "@/components/CustomNode";
 import FloatingEdge from '@/components/FloatingEdge';
 import CustomConnectionLine from '@/components/CustomConnectionLine';
+import { DownOutlined } from "@ant-design/icons";
 
 
 // Define node types for React Flow
@@ -536,27 +537,38 @@ export default () => {
                 nodeTypes={nodeTypes}
                 edgeTypes={edgeTypes}
                 connectionLineComponent={CustomConnectionLine}
-                fitView
-                fitViewOptions={{ padding: 20, includeHiddenNodes: true }}
+                fitView={true}
+                fitViewOptions={{ 
+                  padding: 0.5,  // Reduced padding for better fit
+                  includeHiddenNodes: false,  // Only fit visible nodes
+                  duration: 300  // Smooth transition
+                }}
                 connectionLineStyle={connectionLineStyle}
                 connectionLineType={ConnectionLineType.SmoothStep}
                 panOnDrag
                 minZoom={0.1}
                 maxZoom={2}
-                defaultViewport={{ x: 0, y: 0, zoom: 1 }}
+                defaultViewport={{ x: 0, y: 0, zoom: 0.9 }}  // Slightly zoomed out by default
                 proOptions={{ hideAttribution: true }}
                 nodesConnectable={true}
-                edgesUpdatable={true}
                 elementsSelectable={true}
+                nodesDraggable={true}
+                zoomOnScroll={true}
+                zoomOnPinch={true}
+                panOnScroll={false}
+                preventScrolling={true}
               >
               <Background />
               <Controls />
+              <Panel position="top-left">
+                <Button type="primary" icon={<DownOutlined />} onClick={() => toggleCollapse('all')}>
+                  Collapse
+                </Button>
+              </Panel>
               <Panel position="top-right">
                 <SearchControl />
               </Panel>
-              <Panel position="bottom-right">
-                <ZoomSlider />
-              </Panel>
+        
               </ReactFlow>
             )}
           </div>
