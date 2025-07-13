@@ -232,10 +232,16 @@ export default () => {
       id: `edge-${parentData.id}-${data.id}`,
       source: `structure-${parentData.id}`,
       target: `structure-${data.id}`,
-      type: 'smoothstep',
+      type: 'buttonedge',  // Changed from 'smoothstep' to 'buttonedge' to enable deletion
       animated: true,
       style: { stroke: '#1890ff' },
-      data: { structureId: id }
+      data: { 
+        structureId: id,
+        // Add metadata to identify this as a structure edge
+        isStructureEdge: true,
+        sourceId: parentData.id,
+        targetId: data.id
+      }
     }] : [];
 
     // Create edges for current structure's children
@@ -243,21 +249,33 @@ export default () => {
       id: `edge-${data.id}-${child.id}`,
       source: `structure-${data.id}`,
       target: `structure-${child.id}`,
-      type: 'smoothstep',
-      data: { structureId: id },
+      type: 'buttonedge',  // Changed from 'smoothstep' to 'buttonedge' to enable deletion
+      data: { 
+        structureId: id,
+        // Add metadata to identify this as a structure edge
+        isStructureEdge: true,
+        sourceId: data.id,
+        targetId: child.id
+      },
     }));
 
-    // Combine with existing edges
+    // Combine with existing edges (position edges)
+    const positionEdges = (data.edges || []).map((e: OrganigramEdge) => ({
+      id: String(e.id),
+      source: `${e.source.type}-${e.source.id}`,
+      target: `${e.target.type}-${e.target.id}`,
+      type: 'buttonedge',
+      data: { 
+        structureId: id,
+        // Add metadata to identify this as a position edge
+        isPositionEdge: true
+      },
+    }));
+
     const allEdges = [
       ...parentEdges,
       ...childEdges,
-      ...(data.edges || []).map((e: OrganigramEdge) => ({
-        id: String(e.id),
-        source: `${e.source.type}-${e.source.id}`,
-        target: `${e.target.type}-${e.target.id}`,
-        type: 'buttonedge',
-        data: { structureId: id },
-      }))
+      ...positionEdges
     ];
 
     console.log('Updating graph with:', {

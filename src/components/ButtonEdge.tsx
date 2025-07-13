@@ -1,5 +1,7 @@
 import { memo } from 'react';
 import type { EdgeProps } from '@xyflow/react';
+import { useQueryClient } from '@tanstack/react-query';
+import axios from 'axios';
 
 import { Modal, message, Button } from 'antd';
 import { Trash2 } from 'lucide-react';
@@ -11,6 +13,7 @@ const CustomButtonEdge = (props: EdgeProps) => {
   const structureId = (data as { structureId?: string })?.structureId || '';
   const { mutate: deleteEdge } = useDeleteEdge(structureId);
   const { confirm } = Modal;
+  const queryClient = useQueryClient();
 
   const showConfirm = () => {
     confirm({
@@ -21,21 +24,45 @@ const CustomButtonEdge = (props: EdgeProps) => {
       cancelText: 'Non',
       onOk() {
         return new Promise((resolve, reject) => {
-          deleteEdge(
-            { id },
-            {
-              onSuccess: () => {
-                message.success('Connexion supprimée avec succès');
+          // Check if this is a structure edge
+          if (data?.isStructureEdge) {
+            // For structure edges, we need to update the parent structure
+            const updateData = {
+              parent: null  // Removing the parent by setting it to null
+            };
+            
+            // Make a PATCH request to update the structure
+            axios.patch(`/api/structures/${data.targetId}/`, updateData)
+              .then(() => {
+                message.success('Lien de structure supprimé avec succès');
+                // Invalidate the structure query to refresh the data
+                queryClient.invalidateQueries({ queryKey: ['structure', structureId] });
                 resolve(true);
-              },
-              onError: (error: any) => {
+              })
+              .catch((error: any) => {
                 message.error(
-                  error.response?.data?.detail || 'Failed to delete link'
+                  error.response?.data?.detail || 'Échec de la suppression du lien de structure'
                 );
                 reject(error);
-              },
-            }
-          );
+              });
+          } else {
+            // For position edges, use the existing delete functionality
+            deleteEdge(
+              { id },
+              {
+                onSuccess: () => {
+                  message.success('Connexion supprimée avec succès');
+                  resolve(true);
+                },
+                onError: (error: any) => {
+                  message.error(
+                    error.response?.data?.detail || 'Échec de la suppression de la connexion'
+                  );
+                  reject(error);
+                },
+              }
+            );
+          }
         });
       },
       onCancel() {
