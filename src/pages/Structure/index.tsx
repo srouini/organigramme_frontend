@@ -94,14 +94,13 @@ export default () => {
 
       <CustomProList
         metas={getMetas(refetch)}
-        grid={{ gutter: 16, column: 4 }}
         data={data}
         onItem={(record) => ({
           onClick: () => navigate(`/structures/${record.id}`),
           style: { cursor: 'pointer' },
         })}
         isFetching={isFetching}
-        itemLayout="vertical"
+        itemLayout="horizontal"
         getPageSize={getPageSize}
         showActions="always"
         isLoading={isLoading}

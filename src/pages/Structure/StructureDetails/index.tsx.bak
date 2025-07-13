@@ -1,51 +1,68 @@
+// ===== Imports =====
 import { PageContainer } from "@ant-design/pro-components";
-import type { Connection } from 'reactflow';
-import { addEdge, MarkerType, NodeTypes, Edge, SmoothStepEdge } from '@xyflow/react';
-import CustomButtonEdge from "@/components/ButtonEdge";
-import { ReactFlow, Background, Controls, Panel } from "@xyflow/react";
+import type { Connection, Node, NodeChange, EdgeChange } from 'reactflow';
+import { 
+  addEdge, 
+  MarkerType, 
+  Edge, 
+  ReactFlow, 
+  Background, 
+  Controls, 
+  Panel,
+  useNodesState,
+  useEdgesState,
+  ConnectionLineType,
+  SmoothStepEdge,
+  NodeTypes
 import axios from "axios";
 import "@xyflow/react/dist/style.css";
-import { Button, message, Row, Col } from "antd";
-import StructureHierarchy from "./components/StructureHierarchy";
-import { useParams, useNavigate } from "react-router-dom";
-import {
-  useStructure,
-  useStructureById,
-  useAutoOrganize,
-  useBulkUpdatePositions,
-  useCreateEdge,
-  useDiagramPositions,
-  useUpdateDiagramPosition,
-  DiagramPosition,
-} from "@/hooks/useStructure";
-import { Position, Structure, OrganigramEdge } from "@/types/reference";
-import { useFlow } from "@/context/FlowContext";
-import { useEffect, useCallback, Key } from "react";
-import { ConnectionLineType } from '@xyflow/react';
-import { ZoomSlider } from "@/components/zoom-slider";
-import SearchControl from "./components/SearchControl";
-import CustomNode from "@/components/CustomNode";
-import FloatingEdge from '@/components/FloatingEdge';
-import CustomConnectionLine from '@/components/CustomConnectionLine';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import { useParams, useNavigate } from 'react-router-dom';
+import { Button, Card, Col, Row, Spin, Typography, message } from 'antd';
+import { Node, Edge, NodeChange, EdgeChange, MarkerType, useReactFlow } from '@xyflow/react';
+import { useStructure, useStructureById } from '@/services/structureService';
+import { useAutoOrganize, useBulkUpdatePositions, useDiagramPositions, useUpdateDiagramPosition } from '@/services/diagramService';
+import { useExpandedNodes } from '@/contexts/ExpandedNodesContext';
+import { AppNode, CustomNodeData, LocalDiagramPosition, PositionUpdatePayload, NodePosition } from './types';
+import { Structure } from '@/types/structure';
 
+// ===== Type Definitions =====
+// Renamed to avoid conflict with imported DiagramPosition
+interface LocalDiagramPosition {
+  content_type: string | { model: string };
+  object_id: string | number;
+  main_structure: string | number;
+  position_x: number;
+  position_y: number;
+  created_at?: string;
+  updated_at?: string;
+}
 
-// Define node types for React Flow
-const nodeTypes = {
+// ===== Constants =====
+// Memoize default edge options
+const defaultEdgeOptions = useMemo(() => ({
+  type: 'smoothstep' as const,
+  animated: true,
+  style: { stroke: '#94a3b8', strokeWidth: 2 },
+  markerEnd: {
+    type: MarkerType.ArrowClosed,
+    color: '#94a3b8',
+  },
+}), []);
+
+// Memoize node and edge types to prevent re-renders
+const nodeTypes = useMemo(() => ({
   custom: CustomNode,
-};
+}), []);
 
-// Define edge types for React Flow
-const edgeTypes = {
+const edgeTypes = useMemo(() => ({
   floating: FloatingEdge,
-  buttonedge: CustomButtonEdge,
+  button: CustomButtonEdge,
   smoothstep: SmoothStepEdge,
-};
+}), []);
 
-// Connection line style
-const connectionLineStyle = {
-  stroke: '#b1b1b7',
-  strokeWidth: 2,
-};
+// ===== Components =====
+import StructureHierarchy from "./components/StructureHierarchy";
 
 interface PositionUpdatePayload {
   id: string;
@@ -53,10 +70,12 @@ interface PositionUpdatePayload {
   position_y: number;
 }
 
-export default () => {
+const StructureDetails: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
-  const { data, isPending: isLoading, error } = useStructure(id!);
+  const { data, isLoading } = useStructure(id!);
+  const { expandedNodes } = useExpandedNodes();
+  const { setNodes } = useReactFlow();
 
   // Get parent ID safely, handling both object and number types
   const getParentId = () => {
@@ -65,17 +84,20 @@ export default () => {
   };
   
   const parentId = getParentId();
-  const { data: parentData, isPending: isParentLoading } = useStructureById(parentId?.toString());
-  const { isPending: isAutoOrgLoading, mutate: autoOrg } = useAutoOrganize(id!);
-  const { isPending: isBulkLoading, mutate: bulk } = useBulkUpdatePositions();
+  const { data: parentData, isLoading: isParentLoading } = useStructureById(parentId?.toString());
+  const { isLoading: isAutoOrgLoading, mutate: autoOrg } = useAutoOrganize(id!);
+  const { isLoading: isBulkLoading, mutate: bulk } = useBulkUpdatePositions();
   const { mutate: updateDiagramPosition } = useUpdateDiagramPosition(id!);
   
   // Get diagram positions for the current structure with loading state
   const { 
-    data: diagramPositions = [] as DiagramPosition[],
+    data: diagramPositions = [], 
     isLoading: isLoadingPositions,
-    isSuccess: hasPositions
-  } = useDiagramPositions(id!);
+    isSuccess: hasPositions 
+  } = useDiagramPositions(id || "");
+  
+  // Check if we have all the data needed to render the diagram
+  const hasAllData = data && !isLoadingPositions && hasPositions && Array.isArray(diagramPositions);
 
   const {
     nodes,
@@ -86,13 +108,102 @@ export default () => {
     updateNode,
     onConnect: handleConnect,
   } = useFlow();
+
+  // Update node positions when expanded state changes
+  useEffect(() => {
+    if (nodes.length > 0) {
+      console.log('Expanded nodes changed:', Array.from(expandedNodes));
+      
+      // Create a deep copy of nodes to force re-render
+      const updatedNodes = nodes.map(node => {
+        const isNodeExpanded = expandedNodes.has(node.id);
+        console.log(`Node ${node.id} - isExpanded: ${isNodeExpanded}`);
+        
+        // Create a new object to ensure React detects the change
+        return {
+          ...node,
+          position: { ...node.position }, // Create new position object
+          data: {
+            ...node.data,
+            isExpanded: isNodeExpanded,
+            // Add a timestamp to force re-render
+            _lastUpdated: Date.now()
+          }
+        };
+      });
+      
+      console.log('Forcing graph update with new node data');
+      // Always update to ensure the diagram re-renders
+      setGraph(updatedNodes, edges);
+    }
+  }, [expandedNodes, nodes, edges, setGraph]);
   
-  // Track if we have all the data needed to render the diagram
-  const isDataReady = !!data && hasPositions && !isLoadingPositions;
+  // Add a key to force re-render of the ReactFlow component when expandedNodes change
+  const flowKey = useMemo(() => {
+    return `flow-${Array.from(expandedNodes).slice(0, 10).join('-')}`;
+  }, [expandedNodes]);
+  
+  // Move node and edge types to the top level to prevent "used before declaration" errors
+  const memoizedNodeTypes = useMemo(() => ({
+    custom: CustomNode,
+  }), []);
+
+  const memoizedEdgeTypes = useMemo(() => ({
+    floating: FloatingEdge,
+    button: CustomButtonEdge,
+    smoothstep: SmoothStepEdge,
+  }), []);
+
+  const memoizedEdgeOptions = useMemo(() => ({
+    type: 'smoothstep' as const,
+    animated: true,
+    style: { stroke: '#94a3b8', strokeWidth: 2 },
+    markerEnd: {
+      type: MarkerType.ArrowClosed,
+      color: '#94a3b8',
+    },
+  }), []);
+
+  // ReactFlow props with proper typing
+  const reactFlowProps = useMemo(() => ({
+    key: flowKey,
+    nodes: nodes as AppNode[],
+    edges: edges,
+    onNodesChange,
+    onEdgesChange,
+    onConnect: handleConnect,
+    nodeTypes: memoizedNodeTypes,
+    edgeTypes: memoizedEdgeTypes,
+    defaultEdgeOptions: memoizedEdgeOptions,
+    connectionLineType: ConnectionLineType.SmoothStep,
+    fitView: true,
+    fitViewOptions: { padding: 0.5 },
+    minZoom: 0.1,
+    maxZoom: 2,
+    elementsSelectable: true,
+    nodesConnectable: true,
+    nodesDraggable: true,
+    zoomOnScroll: true,
+    zoomOnPinch: true,
+    panOnScroll: false,
+    selectionOnDrag: true,
+    selectionMode: 'partial' as const,
+    snapToGrid: false,
+    snapGrid: [15, 15] as [number, number],
+    onlyRenderVisibleElements: false,
+    defaultViewport: { x: 0, y: 0, zoom: 1 },
+    translateExtent: [
+      [-1000, -1000],
+      [2000, 2000]
+    ] as [[number, number], [number, number]],
+    nodeExtent: [
+      [-1000, -1000],
+      [2000, 2000]
+    ] as [[number, number], [number, number]]
 
   /* backend → React Flow nodes/edges */
   useEffect(() => {
-    if (!isDataReady) {
+    if (!hasAllData) {
       console.log('Waiting for data to be ready...');
       return;
     }
@@ -106,37 +217,29 @@ export default () => {
     // Ensure diagramPositions is an array before mapping
     const safeDiagramPositions = Array.isArray(diagramPositions) ? diagramPositions : [];
     
-    // Create a map of diagram positions for quick lookup
-    // Key format: 'type-id' for current diagram only
-    const diagramPositionMap = new Map(
-      safeDiagramPositions
-        .filter((dp: DiagramPosition) => {
-          // Skip if content_type is missing
-          if (!dp.content_type) {
-            console.warn('Missing content_type in diagram position:', dp);
-            return false;
-          }
-          // Check if this position belongs to the current diagram
-          return dp.main_structure.toString() === data.id.toString();
-        })
-        .map((dp: DiagramPosition) => {
-          // Handle both string and object content_type formats
-          let type = 'unknown';
-          if (typeof dp.content_type === 'string') {
-            type = dp.content_type.toLowerCase();
-          } else if (typeof dp.content_type === 'object' && dp.content_type !== null) {
-            type = (dp.content_type.model || '').toLowerCase();
-          }
-          
-          return [
-            `${type}-${dp.object_id}`,
-            { x: dp.position_x, y: dp.position_y }
-          ] as const;
-        })
-    );
+    const diagramPositionMap = new Map<string, NodePosition>();
+    
+    // Process positions safely with proper type assertion
+    const positions = Array.isArray(diagramPositions) ? diagramPositions : [];
+    positions.forEach((dp: LocalDiagramPosition) => {
+      // Check if this position belongs to the current diagram
+      if (dp.main_structure.toString() === data.id.toString()) {
+        // Handle both string and object content_type formats
+        let type = 'unknown';
+        const contentType = dp.content_type;
+        if (typeof contentType === 'string') {
+          type = contentType.toLowerCase();
+        } else if (contentType && typeof contentType === 'object' && 'model' in contentType) {
+          type = String(contentType.model || '').toLowerCase();
+        }
+        
+        const key = `${type}-${dp.object_id}`;
+        diagramPositionMap.set(key, { x: dp.position_x, y: dp.position_y });
+      }
+    });
 
     // Function to get position with fallback
-    const getNodePosition = (type: string, id: string, defaultX: number = 0, defaultY: number = 0) => {
+    const getNodePosition = (type: string, id: string | number, defaultX: number = 0, defaultY: number = 0): NodePosition => {
       // Only use positions from the current diagram
       const position = diagramPositionMap.get(`${type}-${id}`);
       return position || { x: defaultX, y: defaultY };
@@ -144,6 +247,14 @@ export default () => {
 
     // Log manager and positions data for debugging
     const currentManagerId = typeof data.manager === 'number' ? data.manager : data.manager?.id;
+    console.log('Current structure manager:', data.manager);
+    console.log('Current structure manager_id:', currentManagerId);
+    console.log('All positions:', data.positions);
+    console.log('Child structures:', data.children?.map((c: Structure) => ({
+      id: c.id,
+      name: c.name,
+      manager: c.manager
+    })));
 
     // Filter out positions that are managers of any structure (current or children)
     const positionNodes = (data.positions || [])
@@ -279,7 +390,35 @@ export default () => {
     });
     
     setGraph(allNodes, allEdges);
-  }, [data, diagramPositions, setGraph, isDataReady]);
+  }, [data, diagramPositions, setGraph, hasAllData]);
+
+  // Update node positions when diagram positions change
+  useEffect(() => {
+    if (!hasAllData || !Array.isArray(diagramPositions)) return;
+
+    // Create a map of node positions from the diagram positions
+    const positionMap = new Map<string, { x: number; y: number }>();
+    (diagramPositions as LocalDiagramPosition[]).forEach((pos) => {
+      positionMap.set(pos.object_id.toString(), {
+        x: pos.position_x,
+        y: pos.position_y,
+      });
+    });
+
+    // Update node positions
+    setNodes((nds: AppNode[]) =>
+      nds.map((node) => {
+        const position = positionMap.get(node.id);
+        if (position) {
+          return {
+            ...node,
+            position,
+          };
+        }
+        return node;
+      })
+    );
+  }, [diagramPositions, hasAllData, setNodes]);
 
   const handleBulkUpdate = async (positions: PositionUpdatePayload[]) => {
     try {
@@ -299,25 +438,30 @@ export default () => {
     }
   }, [autoOrg]);
 
-  const onNodeDragStop = useCallback(
-    async (_: any, node: any) => {
-      if (!data?.id) {
-        console.error('No current structure ID available');
-        return;
-      }
+  // Save node positions to the server
+  const handleNodeDragStop = useCallback(
+    (event: any, node: Node) => {
+      if (!id || !data) return;
 
-      console.log('Node dragged:', { 
-        nodeId: node.id, 
-        position: node.position,
-        currentStructureId: data.id
-      });
+      if (!data) return;
       
-      updateNode(node.id, node.position);
+      const positionUpdate: PositionUpdatePayload = {
+        contentObject: node.data?.content_type || 'position',
+        position: {
+          x: node.position.x,
+          y: node.position.y
+        },
+        main_structure: data.id,
+        object_id: node.id,
+        position_x: node.position.x,
+        position_y: node.position.y,
+        id: node.id,
+        content_type: node.data?.content_type || 'position',
+        created_at: new Date().toISOString(),
+        updated_at: new Date().toISOString()
+      };
       
-      // Extract ID and type from node ID (format: 'type-id')
-      const [type, id] = node.id.split('-')
-      
-      if (type === 'position' && id) {
+      updateDiagramPosition(positionUpdate);
         try {
           console.log('Updating position node:', { 
             positionId: id, 
@@ -494,11 +638,23 @@ export default () => {
   return (
     <PageContainer
       contentWidth="Fluid"
+      header={{
+        title: data?.name || 'Structure',
+        extra: [
+          <Button
+            key="auto-organize"
+            type="primary"
+            onClick={handleAutoOrganize}
+            loading={isAutoOrgLoading}
+            disabled={isLoading || isBulkLoading}
+          >
+            Auto-Organize
+          </Button>,
+        ],
+      }}
     >
-      
-      <Row gutter={16} >
+      <Row gutter={16}>
         <Col span={5}>
-          
           <StructureHierarchy
             data={data}
             currentStructureId={data?.id?.toString()}
@@ -508,7 +664,7 @@ export default () => {
         </Col>
         <Col span={19}>
           <div style={{ 
-            height: 'calc(100vh - 130px)', 
+            height: 'calc(100vh - 250px)', 
             width: '100%', 
             border: '1px solid #f0f0f0', 
             borderRadius: 4,
@@ -527,36 +683,29 @@ export default () => {
               </div>
             ) : (
               <ReactFlow
+                key={flowKey} 
                 nodes={nodes}
                 edges={edges}
                 onNodesChange={onNodesChange}
                 onEdgesChange={onEdgesChange}
-                onConnect={onConnect}
+                onConnect={handleConnect}
                 onNodeDragStop={onNodeDragStop}
                 nodeTypes={nodeTypes}
                 edgeTypes={edgeTypes}
-                connectionLineComponent={CustomConnectionLine}
-                fitView
-                fitViewOptions={{ padding: 20, includeHiddenNodes: true }}
-                connectionLineStyle={connectionLineStyle}
                 connectionLineType={ConnectionLineType.SmoothStep}
+                fitView
                 panOnDrag
                 minZoom={0.1}
                 maxZoom={2}
-                defaultViewport={{ x: 0, y: 0, zoom: 1 }}
-                proOptions={{ hideAttribution: true }}
-                nodesConnectable={true}
-                edgesUpdatable={true}
-                elementsSelectable={true}
               >
-              <Background />
-              <Controls />
-              <Panel position="top-right">
-                <SearchControl />
-              </Panel>
-              <Panel position="bottom-right">
-                <ZoomSlider />
-              </Panel>
+                <Background />
+                <Controls />
+                <Panel position="top-right">
+                  <SearchControl />
+                </Panel>
+                <Panel position="bottom-right">
+                  <ZoomSlider />
+                </Panel>
               </ReactFlow>
             )}
           </div>

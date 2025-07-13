@@ -158,7 +158,6 @@ const CustomProList = <T extends Record<string, any>>({
       {...rest}
       cardBordered={cardBordered}
       ghost={ghost}
-      grid={grid}
       itemCardProps={itemCardProps as any}
       showActions={showActions}
       headerTitle={headerTitle}

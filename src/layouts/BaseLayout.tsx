@@ -406,60 +406,7 @@ export default () => {
             </ReferenceContextProvider>
             
            
-            
-            {/* Original F2 Modal implementation (commented out) */}
-            {/* <Modal
-              title="Quick Navigation"
-              open={isF2ModalVisible}
-              onCancel={closeF2Modal}
-              footer={null}
-              width={500}
-            >
-              <Space direction="vertical" style={{ width: '100%' }}>
-                <div>
-                  <label style={{ display: 'block', marginBottom: '8px' }}>Select MRN</label>
-                  <Select
-                    placeholder="Select an MRN"
-                    style={{ width: '100%' }}
-                    value={selectedMrn}
-                    onChange={handleMrnChange}
-                    options={mrnOptions}
-                    showSearch
-                    filterOption={(input, option) =>
-                      (option?.label ?? '').toString().toLowerCase().includes(input.toLowerCase())
-                    }
-                  />
-                </div>
-                
-                {selectedMrn && (
-                  <div>
-                    <label style={{ display: 'block', marginBottom: '8px' }}>Select Article</label>
-                    <Select
-                      placeholder="Select an article"
-                      style={{ width: '100%' }}
-                      value={selectedArticle}
-                      onChange={handleArticleChange}
-                      options={articleOptions}
-                      showSearch
-                      filterOption={(input, option) =>
-                        (option?.label ?? '').toString().toLowerCase().includes(input.toLowerCase())
-                      }
-                    />
-                  </div>
-                )}
-                
-                {selectedMrn && selectedArticle && (
-                  <Button 
-                    type="primary" 
-                    icon={<ArrowRightOutlined />}
-                    onClick={navigateToArticle}
-                    style={{ marginTop: '16px' }}
-                  >
-                    Navigate
-                  </Button>
-                )}
-              </Space>
-            </Modal> */}
+          
           </ProLayout>
         </ProConfigProvider>
       </ConfigProvider>

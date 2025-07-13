@@ -133,7 +133,6 @@ const AUForm: React.FC<AUFormProps> = ({
 
   const hasPermission = usePermissions();
 
-  console.log(structures?.results)
   return (
     <DraggableModel
       OkButtontext="Sumettre"
@@ -151,7 +150,7 @@ const AUForm: React.FC<AUFormProps> = ({
       isLoading={isLoading}
       initialvalues={initialvalues}
     >
-      <FormObject form={form} >
+      <FormObject form={form} initialvalues={mapInitialValues(initialvalues)} >
         <Row gutter={24}>
           <FormField
             name="name"
