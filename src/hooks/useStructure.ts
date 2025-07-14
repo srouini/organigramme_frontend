@@ -44,7 +44,7 @@ export const useStructure = (id: string) => {
     queryKey: ['structure', id],
     queryFn: async () => {
       const { data } = await axios.get<Structure>(
-        `${API_STRUCTURES_ENDPOINT}${id}/?expand=positions.grade,edges,children,parent,manager,manager.grade`
+        `${API_STRUCTURES_ENDPOINT}${id}/?expand=positions.grade,edges,children,parent,manager,manager.grade,type,children.type,children.manager`
       )
       console.log('Structure data with manager:', data);
       return data
@@ -79,9 +79,10 @@ export const useAutoOrganize = (id: string) => {
   const qc = useQueryClient()
 
   return useMutation<unknown, Error, void>({
-    mutationFn: () => axios.post(`${API_STRUCTURES_ENDPOINT}${id}/auto_organize/`).then(r => r.data),
+    mutationFn: () => axios.post(`${API_STRUCTURES_ENDPOINT}${id}/auto-organize/`).then(r => r.data),
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ['structure', id] })
+      window.location.reload();
     },
   })
 }

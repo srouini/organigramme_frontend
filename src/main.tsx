@@ -8,6 +8,7 @@ import { BrowserRouter as Router } from "react-router-dom";
 import { FlowProvider } from "./context/FlowContext";
 import { AxiosProvider } from "./context/AxiosContext.tsx";
 
+
 const queryClient = new QueryClient();
 
 if ("serviceWorker" in navigator) {

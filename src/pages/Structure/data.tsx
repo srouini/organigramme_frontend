@@ -8,28 +8,30 @@ import Delete from "@/components/Delete";
 import AUForm from "./components/AUForm";
 import Print from "@/components/Print";
 import { SafetyCertificateOutlined } from "@ant-design/icons";
+import { Structure } from "@/types/reference";
 
 export const getMetas = (
   refetch: () => void,
-): ProListProps<any, any>['metas'] =>  ({
+): ProListProps<Structure, any>['metas'] =>  ({
   /** ---------- Main title (“Nom”) ---------- */
   title: {
     dataIndex: 'name',
     title: 'Nom',
   },
 
+
   /** ---------- Status tag (“Etat”) ---------- */
   subTitle: {
-    title: 'État',
-    render: (_, row) => (
-      <Tag color={getStatusColor(row.state)}>{row.state}</Tag>
+    title: 'type',
+    render: (_,row:any) => (
+      <Tag color={row?.type?.color}>{row?.type?.name}</Tag>
     ),
   },
 
   /** ---------- Date (“Créé le”) ---------- */
   content: {
-    title: 'Créé le',
-    render: (_, row) =><><span>Créé le</span> <span style={{marginLeft:"5px",color:"#6c757d",fontWeight:"bold"}}> {renderDate(row.created_at)}</span></> ,
+   
+    render: (_, row:any) =><div><span>Créé le</span> <span style={{marginLeft:"5px",color:"#6c757d",fontWeight:"bold"}}> {renderDate(row.created_at)}</span></div> ,
   },
 
   /** ---------- Per‑card actions ---------- */

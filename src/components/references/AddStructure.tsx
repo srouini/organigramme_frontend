@@ -1,78 +1,62 @@
-import { useEffect, useState } from "react";
-import DraggableModel from "@/components/DraggableModel";
+import React, { useEffect, useState } from "react";
+import DraggableModelFullWidth from "@/components/DraggableModel";
 import FormObject from "@/components/Form";
-import { Divider, Form, message, Row, Select, Button } from "antd";
+import { Divider, Form, message, Row } from "antd";
 import usePost from "@/hooks/usePost";
 import { mapInitialValues } from "@/utils/functions";
 import { useReferenceContext } from "@/context/ReferenceContext";
-import { API_STRUCTURES_ENDPOINT, API_POSITIONS_ENDPOINT } from "@/api/api";
+import {  API_STRUCTURES_ENDPOINT } from "@/api/api";
 import FormField from "@/components/form/FormField";
-import { STRUCTURE_STATES, YES_NO_CHOICES } from "@/utils/constants";
-import { EditOutlined, PlusOutlined, UserAddOutlined } from "@ant-design/icons";
-import { usePermissions } from "@/utils/permissions";
-import AddPosition from "@/components/references/AddPosition";
-
-interface Position {
-  id: string | number;
-  title: string;
-  [key: string]: any;
-}
+import { EditOutlined, PlusOutlined } from "@ant-design/icons";
+import { YES_NO_CHOICES } from "@/utils/constants";
+import AddPosition from "./AddPosition";
 
 interface AUFormProps {
-  refetch: () => void;
+  refetch?: () => void;
   initialvalues?: any;
-  editText?: string;
-  addText?: string;
-  hasIcon?: boolean;
-  disabled?: boolean;
-  
+  onAdded?: (client: any) => void;
 }
 
-const AUForm: React.FC<AUFormProps> = ({
-  refetch,
+const AddStructure: React.FC<AUFormProps> = ({ 
+  refetch, 
   initialvalues,
-  editText = "MODIFIER",
-  addText = "Structure",
-  hasIcon = false,
-  disabled=false
+  onAdded 
 }) => {
   const [form] = Form.useForm();
   const [open, setOpen] = useState(false);
 
-  const { structures,structuresUnonnected,positions,structureTypes } = useReferenceContext();
+  const { structures,structuresUnonnected,positions } = useReferenceContext();
 
   // Fetch structures and positions when the form opens
   useEffect(() => {
     if (open) {
       structures?.fetch();
-      positions?.fetch();
-      structureTypes?.fetch();
+      positions?.fetch()
     }
   }, [open]);
 
-
   const handleFormSubmission = async () => {
-    try {
-      const values = await form.validateFields();
-      const formData = { ...values };
-      
-      if (initialvalues) {
-        formData.id = initialvalues.id;
-      }
-      
-      mutate(formData);
-    } catch (error) {
-      console.error('Form validation failed:', error);
+    let values = await form.validateFields();
+    if (initialvalues) {
+      values.id = initialvalues?.id;
     }
+    mutate(values);
   };
-  
 
-  const onSuccess = () => {
-    message.success("Structure cree avec succes");
+  const onSuccess = (response: any) => {
+    message.success("Structure added successfully");
     setOpen(false);
-    refetch();
-    structures?.refetch();
-    structuresUnonnected?.refetch();
+    if (refetch) refetch();
+    if (structuresUnonnected?.refetch) structuresUnonnected.refetch();
+    
+    // Call the callback with the newly created client
+    if (onAdded && response) {
+      onAdded({
+        id: response.id,
+        name: response.name,
+        // Add any other fields you need
+      });
+    }
   };
 
   const { mutate, isLoading } = usePost({
@@ -80,26 +64,19 @@ const AUForm: React.FC<AUFormProps> = ({
     endpoint: API_STRUCTURES_ENDPOINT,
   });
 
-  const hasPermission = usePermissions();
-
   return (
-    <DraggableModel
-      OkButtontext="Sumettre"
-      modalOpenButtonText={initialvalues ? editText : addText} 
-      modalTitle="Structure"
-      addButtonType="dashed"
-      addButtonIcon={
-        hasIcon && initialvalues ? <EditOutlined /> : <PlusOutlined />
-      }
-      disabledModalOpenButton={disabled || (!initialvalues && !hasPermission('structure.add_structure')) || (initialvalues && !hasPermission('structure.change_structure'))}
+    <DraggableModelFullWidth
+      OkButtontext="Submit"
+      modalTitle="Ajouter une nouvelle structure"
       onSubmit={handleFormSubmission}
+      modalOpenButtonText="Structure"
       setOpen={setOpen}
       open={open}
       width={600}
       isLoading={isLoading}
       initialvalues={initialvalues}
     >
-      <FormObject form={form} initialvalues={mapInitialValues(initialvalues? initialvalues : {parent:null,is_main:false,initial_node:false})} >
+     <FormObject form={form} initialvalues={mapInitialValues(initialvalues)} >
         <Row gutter={24}>
           <FormField
             name="name"
@@ -113,15 +90,6 @@ const AUForm: React.FC<AUFormProps> = ({
             label="Structure Parente"
             type="select"
             options={structures?.results}
-            option_label="name"
-            option_value="id"
-            span_md={24}
-          />
-          <FormField
-            name="type"
-            label="Type"
-            type="select"
-            options={structureTypes?.results}
             option_label="name"
             option_value="id"
             span_md={24}
@@ -164,13 +132,13 @@ const AUForm: React.FC<AUFormProps> = ({
               positions?.refetch();
             }}
           />
-   
-     
- 
+
+          
+         
         </Row>
       </FormObject>
-    </DraggableModel>
+    </DraggableModelFullWidth>
   );
 };
 
-export default AUForm;
+export default AddStructure;

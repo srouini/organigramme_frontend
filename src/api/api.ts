@@ -4,7 +4,7 @@ export const API_GRADES_ENDPOINT = "/api/grades/";
 // Structures
 export const API_STRUCTURES_ENDPOINT = "/api/structures/";
 
-
+export const API_STRUCTURE_TYPE_ENDPOINT = "/api/structure-types/";
 
 // Positions
 export const API_POSITIONS_ENDPOINT = "/api/positions/";

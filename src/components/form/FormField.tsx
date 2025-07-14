@@ -1,11 +1,12 @@
 import React from "react";
-import { Col } from "antd";
+import { Button, Col, Result } from "antd";
 import FormTextInput from "./FormTextInput"; // Adjust the import path as needed
 import FormDateInput from "./FormDateInput"; // Adjust the import path as needed
 import ProFormSelect from "@ant-design/pro-form/lib/components/Select"; // Adjust the import path as needed
 import { selectConfig } from "@/utils/config";
 import ForNumberInput from "./FormNumberInput";
 import FormDateTimeInput from "./FormDateTimeInput";
+import { InboxOutlined, SmileOutlined } from "@ant-design/icons";
 
 interface FormFieldProps {
   name: string;
@@ -28,7 +29,11 @@ interface FormFieldProps {
   minValue?:number;
   maxValue?:number;
   rules?:any;
-  allowClear?: boolean;
+  addFormComponent?: React.ComponentType<any>;
+  showAddButton?: boolean;
+  addButtonText?: string;
+  onAddItem?: (newItem: any) => void;
+  mode?:any
 }
 
 const FormField: React.FC<FormFieldProps> = ({
@@ -52,7 +57,11 @@ const FormField: React.FC<FormFieldProps> = ({
   minValue, 
   maxValue,
   rules,
-  allowClear = false,
+  addFormComponent: AddFormComponent,
+  showAddButton = false,
+  addButtonText = "Add New",
+  onAddItem,
+  mode
 }) => {
   switch (type) {
     case "text":
@@ -121,39 +130,45 @@ const FormField: React.FC<FormFieldProps> = ({
       return (
         <Col span={span} md={span_md}>
           <ProFormSelect
-            style={{width:`${span_md === 24 ? "100%" : ""}`}}
-            {...selectConfig}
-            width="lg"
-            onChange={onChange}
-            options={options?.map(option => {
-              // Handle case where option is already in the correct format
-              if (option.value !== undefined && option.label !== undefined) {
-                return option;
-              }
-              // Handle structure/object with id and name properties
-              const label = option[option_label || 'name'] || option.name || option.label || option.id;
-              const value = option[option_value || 'id'] || option.value || option.id;
-              return {
-                ...option,
-                label,
-                value,
-                key: value // Ensure each option has a unique key
-              };
-            })}
-            initialValue={initialValue}
-            label={label}
-            required={required}
             name={name}
-            disabled={disabled}
-            fieldProps={{
-              showSearch: true,
-              optionFilterProp: 'label',
-              filterOption: (input, option) =>
-                (option?.label ?? '').toLowerCase().includes(input.toLowerCase().trim()),
-              allowClear: true
-            }}
+            label={label}
             placeholder={placeholder}
+            options={options}
+            {...selectConfig}
+            fieldProps={{
+              ...selectConfig,
+              disabled,
+              onChange,
+              fieldNames: {
+                label: option_label,
+                value: option_value,
+              },
+              maxTagCount: 'responsive',
+              defaultValue:defaultValue,
+              notFoundContent: AddFormComponent ? (
+                <div style={{ padding: '8px', textAlign: 'center' }}>
+                  <AddFormComponent
+                    onAdded={(newItem:any) => {
+                      if (onAddItem) {
+                        onAddItem(newItem);
+                      }
+                    }}
+                  />
+                </div>
+              ) : undefined,
+            }}
+            initialValue={initialValue}
+            required={required}
             rules={rules}
+            mode={mode}
+            valueEnum={
+              options?.length
+                ? options.reduce((acc: any, curr: any) => {
+                    acc[curr[option_value]] = curr[option_label];
+                    return acc;
+                  }, {})
+                : undefined
+            }
           />
         </Col>
       );

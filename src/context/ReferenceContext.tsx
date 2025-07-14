@@ -4,6 +4,7 @@ import useGrade from "@/hooks/references/useGrade";
 import { useStructures } from '@/hooks/useStructure';
 import usePositions from "@/hooks/references/usePositions";
 import useStructuresRef from "@/hooks/references/useStructuresRef";
+import useStructureType from "@/hooks/references/useStructureType";
 
 
 const ReferenceContext = createContext<any>(null);
@@ -23,8 +24,10 @@ const ReferenceContextProvider = ({ children }: ReferenceContextProps) => {
 
   const user = useUser();
   const grades = useGrade();
+  const structuresUnonnected = useStructuresRef({ unconnectedOnly: true });
   const structures = useStructuresRef();
   const positions = usePositions();
+  const structureTypes = useStructureType();
   
 
   const contextValues = {
@@ -32,7 +35,9 @@ const ReferenceContextProvider = ({ children }: ReferenceContextProps) => {
     user,
     grades,
     structures,
-    positions
+    structuresUnonnected,
+    positions, 
+    structureTypes
   };
 
   return (

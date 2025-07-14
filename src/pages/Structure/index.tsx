@@ -39,7 +39,7 @@ export default () => {
       page_size: getPageSize(),
       ...filters,
       ordering: "-id",
-      is_main: true,
+      expand: "type"
     },
   });
 
@@ -95,7 +95,7 @@ export default () => {
       <CustomProList
         metas={getMetas(refetch)}
         data={data}
-        onItem={(record) => ({
+        onItem={(record:any) => ({
           onClick: () => navigate(`/structures/${record.id}`),
           style: { cursor: 'pointer' },
         })}

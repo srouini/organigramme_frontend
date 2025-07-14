@@ -15,6 +15,11 @@ import { BaseModel } from "./commun";
     description?: string;
   }
 
+  export interface StructureType extends BaseModel {
+    name?: string;
+    color?: string;
+  }
+
   export interface Structure extends BaseModel {
     name?: string;
     state?: string;
@@ -24,6 +29,7 @@ import { BaseModel } from "./commun";
     edges?: StructureEdge[];
     manager?: Position;
     diagram_positions?: DiagramPosition[];
+    type?:StructureType ;
   }
 
   export interface DiagramPosition extends BaseModel {
@@ -35,6 +41,24 @@ import { BaseModel } from "./commun";
   }
 
   export interface Position extends BaseModel {
+    structure: Structure | number;
+    title: string;
+    grade: Grade; // Foreign key to Grade, can be ID or object
+    formation?: string;
+    quantity?: number;
+    mission_principal?: string;
+    experience?: string;
+    abbreviation?: string;
+    category?: string;
+    position_x?: number;
+    position_y?: number;
+    initial_node?: boolean;
+    parent?: Position;
+    diagram_positions?: DiagramPosition[];
+  }
+
+
+  export interface PositionType extends BaseModel {
     structure: Structure | number;
     title: string;
     grade: Grade; // Foreign key to Grade, can be ID or object

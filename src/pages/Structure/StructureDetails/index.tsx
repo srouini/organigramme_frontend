@@ -498,16 +498,8 @@ export default () => {
     >
       
       <Row gutter={16} >
-        <Col span={5}>
-          
-          <StructureHierarchy
-            data={data}
-            currentStructureId={data?.id?.toString()}
-            onSelect={handleNodeSelect}
-            onShowParent={handleShowParent}
-          />
-        </Col>
-        <Col span={19}>
+      
+        <Col span={24}>
           <div style={{ 
             height: 'calc(100vh - 130px)', 
             width: '100%', 
@@ -559,10 +551,16 @@ export default () => {
                 preventScrolling={true}
               >
               <Background />
-              <Controls />
+              <Controls>
+              </Controls>
               <Panel position="top-left">
-                <Button type="primary" icon={<DownOutlined />} onClick={() => toggleCollapse('all')}>
-                  Collapse
+              <Button
+                  type="primary"
+                  onClick={handleAutoOrganize}
+                  loading={isAutoOrgLoading}
+                  style={{ marginLeft: 8 }}
+                >
+                  Auto-Organize
                 </Button>
               </Panel>
               <Panel position="top-right">
