@@ -208,6 +208,52 @@ export default () => {
         });
 
         const currentManagerId = typeof structure.manager === 'number' ? structure.manager : structure.manager?.id;
+        // Combine children and positions into a single array
+        const allChildren = [
+          ...(structure.children || []),
+          ...(structure.positions || []).filter(p => {
+            const isCurrentManager = currentManagerId === p.id;
+            const isChildManager = structure.children?.some(s => (typeof s.manager === 'number' ? s.manager : s.manager?.id) === p.id) || false;
+            return !(isCurrentManager || isChildManager);
+          })
+        ];
+
+        function isStructure(node: Structure | Position): node is Structure {
+          return (node as Structure).children !== undefined;
+        }
+
+        allChildren.forEach(child => {
+          if (isStructure(child)) {
+            // It's a Structure
+            edges.push({
+              id: `edge-${structure.id}-${child.id}`,
+              source: `structure-${structure.id}`,
+              target: `structure-${child.id}`,
+              type: 'smoothstep',
+            });
+            if (level < maxLevel) {
+              traverse(child, level + 1);
+            }
+          } else {
+            // It's a Position
+            if (level < maxLevel) {
+              const nodeId = `position-${child.id}`;
+              nodes.push({
+                type: 'custom',
+                id: nodeId,
+                position: getNodePosition('position', child.id.toString()),
+                data: { position: child, type: 'position', data: child },
+              });
+              edges.push({
+                id: `edge-struct-${structure.id}-pos-${child.id}`,
+                source: `structure-${structure.id}`,
+                target: nodeId,
+                type: 'smoothstep',
+              });
+            }
+          }
+        });
+
         const positionEdges = (structure.edges || []).map((e: OrganigramEdge) => ({
           id: String(e.id),
           source: `${e.source.type}-${e.source.id}`,
@@ -218,29 +264,6 @@ export default () => {
         edges.push(...positionEdges);
 
         if (level < maxLevel) {
-          const positionNodes = (structure.positions || [])
-            .filter(p => {
-              const isCurrentManager = currentManagerId === p.id;
-              const isChildManager = structure.children?.some(s => (typeof s.manager === 'number' ? s.manager : s.manager?.id) === p.id) || false;
-              return !(isCurrentManager || isChildManager);
-            })
-            .map((p: Position, index: number) => ({
-              type: 'custom',
-              id: `position-${p.id}`,
-              position: getNodePosition('position', p.id.toString(), structurePosition.x + (index * 200), structurePosition.y + 100),
-              data: { position: p, type: 'position', data: p },
-            }));
-          nodes.push(...positionNodes);
-
-          positionNodes.forEach(pNode => {
-            edges.push({
-              id: `edge-struct-${structure.id}-pos-${pNode.data.position.id}`,
-              source: `structure-${structure.id}`,
-              target: pNode.id,
-              type: 'smoothstep',
-            });
-          });
-
           (structure.children || []).forEach(child => {
             edges.push({
               id: `edge-${structure.id}-${child.id}`,
