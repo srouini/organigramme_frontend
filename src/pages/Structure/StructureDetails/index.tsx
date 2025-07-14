@@ -208,29 +208,6 @@ export default () => {
         });
 
         const currentManagerId = typeof structure.manager === 'number' ? structure.manager : structure.manager?.id;
-        const positionNodes = (structure.positions || [])
-          .filter(p => {
-            const isCurrentManager = currentManagerId === p.id;
-            const isChildManager = structure.children?.some(s => (typeof s.manager === 'number' ? s.manager : s.manager?.id) === p.id) || false;
-            return !(isCurrentManager || isChildManager);
-          })
-          .map((p: Position, index: number) => ({
-            type: 'custom',
-            id: `position-${p.id}`,
-            position: getNodePosition('position', p.id.toString(), structurePosition.x + (index * 200), structurePosition.y + 100),
-            data: { position: p, type: 'position', data: p },
-          }));
-        nodes.push(...positionNodes);
-
-        positionNodes.forEach(pNode => {
-          edges.push({
-            id: `edge-struct-${structure.id}-pos-${pNode.data.position.id}`,
-            source: `structure-${structure.id}`,
-            target: pNode.id,
-            type: 'smoothstep',
-          });
-        });
-
         const positionEdges = (structure.edges || []).map((e: OrganigramEdge) => ({
           id: String(e.id),
           source: `${e.source.type}-${e.source.id}`,
@@ -241,6 +218,29 @@ export default () => {
         edges.push(...positionEdges);
 
         if (level < maxLevel) {
+          const positionNodes = (structure.positions || [])
+            .filter(p => {
+              const isCurrentManager = currentManagerId === p.id;
+              const isChildManager = structure.children?.some(s => (typeof s.manager === 'number' ? s.manager : s.manager?.id) === p.id) || false;
+              return !(isCurrentManager || isChildManager);
+            })
+            .map((p: Position, index: number) => ({
+              type: 'custom',
+              id: `position-${p.id}`,
+              position: getNodePosition('position', p.id.toString(), structurePosition.x + (index * 200), structurePosition.y + 100),
+              data: { position: p, type: 'position', data: p },
+            }));
+          nodes.push(...positionNodes);
+
+          positionNodes.forEach(pNode => {
+            edges.push({
+              id: `edge-struct-${structure.id}-pos-${pNode.data.position.id}`,
+              source: `structure-${structure.id}`,
+              target: pNode.id,
+              type: 'smoothstep',
+            });
+          });
+
           (structure.children || []).forEach(child => {
             edges.push({
               id: `edge-${structure.id}-${child.id}`,
