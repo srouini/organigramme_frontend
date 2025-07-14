@@ -16,18 +16,18 @@ import {
   useCreateEdge,
   useDiagramPositions,
   useUpdateDiagramPosition,
+  useLazyStructureById, // Import the new hook
   DiagramPosition,
 } from "@/hooks/useStructure";
 import { Position, Structure, OrganigramEdge } from "@/types/reference";
 import { useFlow } from "@/context/FlowContext";
-import { useEffect, useCallback, Key } from "react";
+import { useEffect, useCallback, Key, useState } from "react";
 import { ConnectionLineType } from '@xyflow/react';
 import { ZoomSlider } from "@/components/zoom-slider";
 import SearchControl from "./components/SearchControl";
 import CustomNode from "@/components/CustomNode";
 import FloatingEdge from '@/components/FloatingEdge';
 import CustomConnectionLine from '@/components/CustomConnectionLine';
-import { DownOutlined } from "@ant-design/icons";
 
 
 // Define node types for React Flow
@@ -57,20 +57,16 @@ interface PositionUpdatePayload {
 export default () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
+  const [displayLevel, setDisplayLevel] = useState(1);
   const { data, isPending: isLoading, error } = useStructure(id!);
 
-  // Get parent ID safely, handling both object and number types
-  const getParentId = () => {
-    if (!data?.parent) return undefined;
-    return typeof data.parent === 'object' ? data.parent.id : data.parent;
-  };
-  
-  const parentId = getParentId();
-  const { data: parentData, isPending: isParentLoading } = useStructureById(parentId?.toString());
+
   const { isPending: isAutoOrgLoading, mutate: autoOrg } = useAutoOrganize(id!);
   const { isPending: isBulkLoading, mutate: bulk } = useBulkUpdatePositions();
-  const { mutate: updateDiagramPosition } = useUpdateDiagramPosition(id!);
-  
+  const { mutate: updateDiagramPosition } = useUpdateDiagramPosition(id!); 
+  const [organigramData, setOrganigramData] = useState<Structure | null>(null);
+  const [structuresToFetch, setStructuresToFetch] = useState<Set<string>>(new Set());
+  const { refetch: fetchStructureById } = useLazyStructureById();
   // Get diagram positions for the current structure with loading state
   const { 
     data: diagramPositions = [] as DiagramPosition[],
@@ -91,44 +87,84 @@ export default () => {
   // Track if we have all the data needed to render the diagram
   const isDataReady = !!data && hasPositions && !isLoadingPositions;
 
+  // Effect to initialize the main organigram data
+  useEffect(() => {
+    if (data && !organigramData) {
+      setOrganigramData(data);
+    }
+  }, [data, organigramData]);
+
+  // Effect to fetch structures that are needed for display
+  useEffect(() => {
+    if (structuresToFetch.size === 0) return;
+
+    const fetchAll = async () => {
+      const fetchedStructures = await Promise.all(
+        Array.from(structuresToFetch).map(id => fetchStructureById(id).catch(e => {
+          console.error(`Failed to fetch structure ${id}`, e);
+          return null; // Return null on error to not break Promise.all
+        }))
+      );
+
+      const validStructures = fetchedStructures.filter((s): s is Structure => s !== null);
+
+      if (validStructures.length > 0) {
+        setOrganigramData(currentData => {
+          if (!currentData) return null;
+
+          let updatedData = { ...currentData };
+
+          const replaceChildRecursive = (structures: Structure[], newChild: Structure): Structure[] => {
+            return structures.map(s => {
+              if (s.id === newChild.id) {
+                return newChild;
+              }
+              if (s.children) {
+                return { ...s, children: replaceChildRecursive(s.children, newChild) };
+              }
+              return s;
+            });
+          };
+
+          validStructures.forEach(fs => {
+            const newChildren = replaceChildRecursive(updatedData.children || [], fs);
+            updatedData = { ...updatedData, children: newChildren };
+          });
+
+          return updatedData;
+        });
+      }
+
+      setStructuresToFetch(new Set()); // Clear the set after fetching
+    };
+
+    fetchAll();
+  }, [structuresToFetch, fetchStructureById]);
+
   /* backend → React Flow nodes/edges */
   useEffect(() => {
     if (!isDataReady) {
       console.log('Waiting for data to be ready...');
       return;
     }
-    
-    console.log('Rendering diagram with data:', {
-      structureId: data?.id,
-      positionsCount: data?.positions?.length,
-      diagramPositionsCount: diagramPositions?.length
-    });
 
-    // Ensure diagramPositions is an array before mapping
     const safeDiagramPositions = Array.isArray(diagramPositions) ? diagramPositions : [];
-    
-    // Create a map of diagram positions for quick lookup
-    // Key format: 'type-id' for current diagram only
     const diagramPositionMap = new Map(
       safeDiagramPositions
         .filter((dp: DiagramPosition) => {
-          // Skip if content_type is missing
           if (!dp.content_type) {
             console.warn('Missing content_type in diagram position:', dp);
             return false;
           }
-          // Check if this position belongs to the current diagram
           return dp.main_structure.toString() === data.id.toString();
         })
         .map((dp: DiagramPosition) => {
-          // Handle both string and object content_type formats
           let type = 'unknown';
           if (typeof dp.content_type === 'string') {
             type = dp.content_type.toLowerCase();
           } else if (typeof dp.content_type === 'object' && dp.content_type !== null) {
             type = (dp.content_type.model || '').toLowerCase();
           }
-          
           return [
             `${type}-${dp.object_id}`,
             { x: dp.position_x, y: dp.position_y }
@@ -136,151 +172,123 @@ export default () => {
         })
     );
 
-    // Function to get position with fallback
     const getNodePosition = (type: string, id: string, defaultX: number = 0, defaultY: number = 0) => {
-      // Only use positions from the current diagram
       const position = diagramPositionMap.get(`${type}-${id}`);
       return position || { x: defaultX, y: defaultY };
     };
 
-    // Log manager and positions data for debugging
-    const currentManagerId = typeof data.manager === 'number' ? data.manager : data.manager?.id;
+    const getNodesAndEdgesByLevel = (rootStructure: Structure, maxLevel: number) => {
+      const nodes: any[] = [];
+      const edges: any[] = [];
+      const visited = new Set<string>();
+      const missingStructures = new Set<string>();
 
-    // Filter out positions that are managers of any structure (current or children)
-    const positionNodes = (data.positions || [])
-      .filter((p: Position) => {
-        // Check if this position is the manager of the current structure
-        const isCurrentManager = currentManagerId === p.id;
-        
-        // Check if this position is a manager of any child structure
-        const isChildManager = data.children?.some((s: Structure) => {
-          const childManagerId = typeof s.manager === 'number' ? s.manager : s.manager?.id;
-          return childManagerId === p.id;
-        }) || false;
-        
-        // Log filtering decision
-        if (isCurrentManager || isChildManager) {
-          console.log(`Filtering out position ${p.id} (${p.title}) - isCurrentManager: ${isCurrentManager}, isChildManager: ${isChildManager}`);
+      function traverse(structure: Structure, level: number) {
+
+        if (!structure || level > maxLevel || visited.has(`structure-${structure.id}`)) {
+          return;
         }
-        
-        // Only include positions that are not managers of any structure
-        return !(isCurrentManager || isChildManager);
-      })
-      .map((p: Position, index: number) => {
-        const position = getNodePosition('position', p.id.toString(), index * 200, 100);
-        
-        return {
+
+        visited.add(`structure-${structure.id}`);
+
+
+
+        const structurePosition = getNodePosition('structure', structure.id.toString());
+
+        nodes.push({
           type: 'custom',
-          id: `position-${p.id}`,
-          position,
+          id: `structure-${structure.id}`,
+          position: structurePosition,
           data: {
-            position: p,
-            type: 'position',
-            data: p,
+            position: { id: structure.id, title: structure.name, structure: structure.id } as Position,
+            type: 'structure',
+            data: structure,
           },
-        };
-      });
+          style: level === 1 ? { border: '2px solid #52c41a' } : {},
+        });
 
-    // Add parent structure node if exists
-    const parentNode = parentData ? [{
-      type: 'custom',
-      id: `structure-${parentData.id}`,
-      position: getNodePosition('structure', parentData.id.toString(), 0, 0),
-      data: {
-        position: { id: parentData.id, title: parentData.name, structure: parentData.id } as Position,
-        type: 'structure',
-        data: parentData,
-      },
-      style: { border: '2px solid #1890ff' } // Highlight parent node
-    }] : [];
+        const currentManagerId = typeof structure.manager === 'number' ? structure.manager : structure.manager?.id;
+        const positionNodes = (structure.positions || [])
+          .filter(p => {
+            const isCurrentManager = currentManagerId === p.id;
+            const isChildManager = structure.children?.some(s => (typeof s.manager === 'number' ? s.manager : s.manager?.id) === p.id) || false;
+            return !(isCurrentManager || isChildManager);
+          })
+          .map((p: Position, index: number) => ({
+            type: 'custom',
+            id: `position-${p.id}`,
+            position: getNodePosition('position', p.id.toString(), structurePosition.x + (index * 200), structurePosition.y + 100),
+            data: { position: p, type: 'position', data: p },
+          }));
+        nodes.push(...positionNodes);
 
-    // Add current structure node
-    const currentStructureNode = {
-      type: 'custom',
-      id: `structure-${data.id}`,
-      position: getNodePosition('structure', data.id.toString(), 200, 200),
-      data: {
-        position: { id: data.id, title: data.name, structure: data.id } as Position,
-        type: 'structure',
-        data: data,
-      },
-      style: { border: '2px solid #52c41a' } // Highlight current node
+        positionNodes.forEach(pNode => {
+          edges.push({
+            id: `edge-struct-${structure.id}-pos-${pNode.data.position.id}`,
+            source: `structure-${structure.id}`,
+            target: pNode.id,
+            type: 'smoothstep',
+          });
+        });
+
+        const positionEdges = (structure.edges || []).map((e: OrganigramEdge) => ({
+          id: String(e.id),
+          source: `${e.source.type}-${e.source.id}`,
+          target: `${e.target.type}-${e.target.id}`,
+          type: 'buttonedge',
+          data: { structureId: id, isPositionEdge: true },
+        }));
+        edges.push(...positionEdges);
+
+        if (level < maxLevel) {
+          (structure.children || []).forEach(child => {
+            edges.push({
+              id: `edge-${structure.id}-${child.id}`,
+              source: `structure-${structure.id}`,
+              target: `structure-${child.id}`,
+              type: 'buttonedge',
+              data: { structureId: id, isStructureEdge: true, sourceId: structure.id, targetId: child.id },
+            });
+
+            // If a child is just a reference (e.g., no 'name' or 'positions'), it needs to be fetched.
+            if (!child.name || !child.positions) {
+              missingStructures.add(child.id.toString());
+            } else {
+              traverse(child, level + 1);
+            }
+          });
+        }
+      }
+
+      if (rootStructure) {
+        traverse(rootStructure, 1);
+      }
+
+      if (missingStructures.size > 0) {
+        setStructuresToFetch(missingStructures);
+      }
+
+      return { nodes, edges };
     };
 
-    // Add child structure nodes
-    const childStructureNodes = (data.children || []).map((s: Structure) => ({
-      type: 'custom',
-      id: `structure-${s.id}`,
-      position: diagramPositionMap.get(`structure-${s.id}`) || { x: 0, y: 0 },
-      data: {
-        position: { id: s.id, title: s.name, structure: s.id } as Position,
-        type: 'structure',
-        data: s,
-      },
-    }));
+    if (!organigramData) {
+      return; // Don't render until the main data is ready
+    }
 
-    const allNodes = [...parentNode, currentStructureNode, ...positionNodes, ...childStructureNodes];
+    const { nodes: structureNodes, edges: structureEdges } = getNodesAndEdgesByLevel(organigramData, displayLevel);
 
-    // Create edges for parent-child relationships
-    const parentEdges = parentData ? [{
-      id: `edge-${parentData.id}-${data.id}`,
-      source: `structure-${parentData.id}`,
-      target: `structure-${data.id}`,
-      type: 'buttonedge',  // Changed from 'smoothstep' to 'buttonedge' to enable deletion
-      animated: true,
-      style: { stroke: '#1890ff' },
-      data: { 
-        structureId: id,
-        // Add metadata to identify this as a structure edge
-        isStructureEdge: true,
-        sourceId: parentData.id,
-        targetId: data.id
-      }
-    }] : [];
-
-    // Create edges for current structure's children
-    const childEdges = (data.children || []).map((child: Structure) => ({
-      id: `edge-${data.id}-${child.id}`,
-      source: `structure-${data.id}`,
-      target: `structure-${child.id}`,
-      type: 'buttonedge',  // Changed from 'smoothstep' to 'buttonedge' to enable deletion
-      data: { 
-        structureId: id,
-        // Add metadata to identify this as a structure edge
-        isStructureEdge: true,
-        sourceId: data.id,
-        targetId: child.id
-      },
-    }));
-
-    // Combine with existing edges (position edges)
-    const positionEdges = (data.edges || []).map((e: OrganigramEdge) => ({
-      id: String(e.id),
-      source: `${e.source.type}-${e.source.id}`,
-      target: `${e.target.type}-${e.target.id}`,
-      type: 'buttonedge',
-      data: { 
-        structureId: id,
-        // Add metadata to identify this as a position edge
-        isPositionEdge: true
-      },
-    }));
-
-    const allEdges = [
-      ...parentEdges,
-      ...childEdges,
-      ...positionEdges
-    ];
+    const allNodes = [...structureNodes];
+    const allEdges = [...structureEdges];
 
     console.log('Updating graph with:', {
       nodes: allNodes.length,
       edges: allEdges.length,
-      firstNode: allNodes[0],
-      firstEdge: allEdges[0]
+      displayLevel,
     });
     
     setGraph(allNodes, allEdges);
-  }, [data, diagramPositions, setGraph, isDataReady]);
+  }, [organigramData, diagramPositions, displayLevel]);
+
 
   const handleBulkUpdate = async (positions: PositionUpdatePayload[]) => {
     try {
@@ -371,20 +379,10 @@ export default () => {
 
   const { mutate: createEdge } = useCreateEdge(id!);
 
-  const edgeTypes = {
-    buttonedge: CustomButtonEdge,
-    smoothstep: SmoothStepEdge,
-    default: SmoothStepEdge,
-  };
 
-  const nodeTypes: NodeTypes = {
-    custom: CustomNode as any, // Type assertion to handle the type mismatch
-  };
-  
-  const connectionLineStyle = {
-    stroke: '#b1b1b7',
-    strokeWidth: 2,
-  };
+
+
+
 
   const defaultEdgeOptions = {
     type: 'smoothstep',
@@ -564,7 +562,15 @@ export default () => {
                 </Button>
               </Panel>
               <Panel position="top-right">
-                <SearchControl />
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                  <div style={{ display: 'flex', gap: '8px' }}>
+                      <Button onClick={() => setDisplayLevel(l => l + 1)}>+ Level</Button>
+                      <Button onClick={() => setDisplayLevel(l => Math.max(1, l - 1))}>− Level</Button>
+                      <SearchControl />
+                  </div>
+             
+                  
+                </div>
               </Panel>
         
               </ReactFlow>

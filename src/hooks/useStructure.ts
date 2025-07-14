@@ -71,6 +71,26 @@ export const useStructureById = (id: string | number | undefined) => {
   })
 }
 
+// Lazy query for fetching a structure by ID on demand
+export const useLazyStructureById = () => {
+  const axios = useAxios();
+  const queryClient = useQueryClient();
+
+  const fetchStructure = async (id: string): Promise<Structure> => {
+    const { data } = await axios.get<Structure>(`${API_STRUCTURES_ENDPOINT}${id}/?expand=children,positions,parent,manager`);
+    return data;
+  };
+
+  return {
+    refetch: async (id: string) => {
+      return await queryClient.fetchQuery<Structure>({ 
+        queryKey: ['structure', id], 
+        queryFn: () => fetchStructure(id) 
+      });
+    },
+  };
+};
+
 /* ------------------------------------------------------------------
    Hook: POST /auto-organize/ then refetch that structure
    ------------------------------------------------------------------ */
