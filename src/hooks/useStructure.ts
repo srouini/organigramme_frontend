@@ -44,7 +44,7 @@ export const useStructure = (id: string) => {
     queryKey: ['structure', id],
     queryFn: async () => {
       const { data } = await axios.get<Structure>(
-        `${API_STRUCTURES_ENDPOINT}${id}/?expand=positions.grade,edges,children,parent,manager,manager.grade,type,children.type,children.manager`
+        `${API_STRUCTURES_ENDPOINT}${id}/?expand=positions.grade,positions.grade,edges,children,children.type,parent,manager,manager.grade,type,children.manager`
       )
       console.log('Structure data with manager:', data);
       return data
@@ -77,7 +77,7 @@ export const useLazyStructureById = () => {
   const queryClient = useQueryClient();
 
   const fetchStructure = async (id: string): Promise<Structure> => {
-    const { data } = await axios.get<Structure>(`${API_STRUCTURES_ENDPOINT}${id}/?expand=children,positions,parent,manager`);
+    const { data } = await axios.get<Structure>(`${API_STRUCTURES_ENDPOINT}${id}/?expand=children,children.type,type,positions,positions.grade,parent,manager,manager.grade`);
     return data;
   };
 

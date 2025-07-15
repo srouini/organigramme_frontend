@@ -19,6 +19,7 @@ interface Props {
   addButtonType?: "default" | "link" | "primary" | "text" | "dashed";
   buttonType?: "Button" | "Link";
   disabledModalOpenButton?: boolean;
+  isFullWidthOpenButton?: boolean;
 }
 
 const DraggableModel: React.FC<Props> = ({
@@ -35,6 +36,7 @@ const DraggableModel: React.FC<Props> = ({
   addButtonType = "default",
   buttonType = "Button",
   disabledModalOpenButton = false,
+  isFullWidthOpenButton = false,
 }) => {
   const [disabled, setDisabled] = useState(true);
   const [bounds, setBounds] = useState({
@@ -84,6 +86,7 @@ const DraggableModel: React.FC<Props> = ({
         icon={addButtonIcon}
         type={addButtonType}
         disabled={disabledModalOpenButton}
+        style={{width:isFullWidthOpenButton?'100%':undefined}}
       >
         {modalOpenButtonText}
       </Button>

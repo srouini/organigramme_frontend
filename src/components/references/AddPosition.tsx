@@ -9,6 +9,7 @@ import { API_POSITIONS_ENDPOINT, API_STRUCTURES_ENDPOINT } from "@/api/api";
 import FormField from "@/components/form/FormField";
 import { EditOutlined, PlusOutlined } from "@ant-design/icons";
 import { YES_NO_CHOICES } from "@/utils/constants";
+import AddGrade from "./AddGrade";
 
 interface AUFormProps {
   refetch?: () => void;
@@ -75,8 +76,9 @@ const AddStructure: React.FC<AUFormProps> = ({
       width={600}
       isLoading={isLoading}
       initialvalues={initialvalues}
+      isFullWidthOpenButton
     >
-      <FormObject form={form}  >
+      <FormObject form={form}  initialvalues={{quantity:1}}>
         <Row gutter={24}>
 
           <FormField
@@ -118,7 +120,15 @@ const AddStructure: React.FC<AUFormProps> = ({
             option_label="name"
             required
             span_md={24}
+            addFormComponent={AddGrade}
+            onAddItem={(newRecord:any) => {                          
+              form.setFieldValue('grade', newRecord.id);
+              grades?.refetch();
+            }}
           />
+
+          <Divider style={{ marginTop: "0px" }} />
+
           <FormField
             name="category"
             label="Categorie"
@@ -126,13 +136,14 @@ const AddStructure: React.FC<AUFormProps> = ({
 
             span_md={24}
           />
+        
           <Divider style={{ marginTop: "0px" }} />
 
           <FormField
             name="mission_principal"
             label="Mission Principale"
             type="text"
-            required
+            
             span_md={24}
           />
 
@@ -140,7 +151,6 @@ const AddStructure: React.FC<AUFormProps> = ({
             name="formation"
             label="Formation"
             type="text"
-            required
             span_md={24}
           />
 
@@ -149,7 +159,7 @@ const AddStructure: React.FC<AUFormProps> = ({
             name="experience"
             label="Expérience"
             type="text"
-            required
+            
             span_md={24}
           />
           <FormField

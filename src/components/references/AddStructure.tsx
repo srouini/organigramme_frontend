@@ -25,13 +25,14 @@ const AddStructure: React.FC<AUFormProps> = ({
   const [form] = Form.useForm();
   const [open, setOpen] = useState(false);
 
-  const { structures,structuresUnonnected,positions } = useReferenceContext();
+  const { structures,structuresUnonnected,positions,structureTypes } = useReferenceContext();
 
   // Fetch structures and positions when the form opens
   useEffect(() => {
     if (open) {
       structures?.fetch();
       positions?.fetch()
+      structureTypes?.fetch()
     }
   }, [open]);
 
@@ -68,6 +69,7 @@ const AddStructure: React.FC<AUFormProps> = ({
     <DraggableModelFullWidth
       OkButtontext="Submit"
       modalTitle="Ajouter une nouvelle structure"
+      isFullWidthOpenButton
       onSubmit={handleFormSubmission}
       modalOpenButtonText="Structure"
       setOpen={setOpen}
@@ -76,7 +78,7 @@ const AddStructure: React.FC<AUFormProps> = ({
       isLoading={isLoading}
       initialvalues={initialvalues}
     >
-     <FormObject form={form} initialvalues={mapInitialValues(initialvalues)} >
+     <FormObject form={form} initialvalues={mapInitialValues({is_main:false,initial_node:false})} >
         <Row gutter={24}>
           <FormField
             name="name"
@@ -96,6 +98,16 @@ const AddStructure: React.FC<AUFormProps> = ({
           />
           <Divider style={{ marginTop: "0px" }} />
           
+          <FormField
+            name="type"
+            label="Type"
+            type="select"
+            options={structureTypes?.results}
+            option_label="name"
+            option_value="id"
+            span_md={24}
+          />
+
           <FormField
             name="is_main"
             label="Structure Principale"

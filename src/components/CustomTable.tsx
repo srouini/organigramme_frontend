@@ -27,7 +27,8 @@ type CustomTableProps = {
   toolbar?:any,
   isFetching?:boolean,
   cardBordered?:boolean
-  hasoptions?:boolean
+  hasoptions?:boolean,
+  expandable?:boolean
 };
 
 const CustomTable: React.FC<CustomTableProps> = ({
@@ -47,7 +48,7 @@ const CustomTable: React.FC<CustomTableProps> = ({
   toolbar,
   isFetching,
   cardBordered=true,
-  hasoptions=true
+  hasoptions=true,
 }) => {
   const [tableData, setTableData] = useState(data);
 

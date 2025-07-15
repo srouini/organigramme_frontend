@@ -79,6 +79,7 @@ const CustomNode: FC<CustomNodeProps> = ({ data, id, selected }) => {
         backgroundColor: `${position.grade?.color}20`,
         color: position.grade?.color,
         border: `1px solid ${position.grade?.color}40`,
+        fontSize: '15px',
       },
     };
 
@@ -96,7 +97,7 @@ const CustomNode: FC<CustomNodeProps> = ({ data, id, selected }) => {
           {!position.initial_node && (
             <Handle type="target" position={HandlePosition.Top} className="custom-handle" />
           )}
-          <Row gutter={16}>
+          <Row gutter={16} wrap={false}>
             <Col>
               <Flex justify="center" align="center" style={{ height: '100%' }}>
                 <Badge count={position.quantity}>
@@ -105,7 +106,7 @@ const CustomNode: FC<CustomNodeProps> = ({ data, id, selected }) => {
               </Flex>
             </Col>
             <Col style={{ marginLeft: "8px", display: 'flex', flexDirection: 'column', alignItems: 'start', justifyContent: 'center' }}>
-              <div style={{ textAlign: 'left', marginBottom: '8px', fontWeight: 500, color: '#333' }}>
+              <div style={{ textAlign: 'left', marginBottom: '8px', fontWeight: 500, color: '#333', fontSize: '20px' }}>
                 {position.title}
               </div>
               <Flex justify="left" align="start">
@@ -113,6 +114,7 @@ const CustomNode: FC<CustomNodeProps> = ({ data, id, selected }) => {
               </Flex>
             </Col>
             <Col>
+            
               <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: '6px' }}>
                 <Tooltip title="View details" placement="top">
                   <Button
@@ -149,7 +151,7 @@ const CustomNode: FC<CustomNodeProps> = ({ data, id, selected }) => {
         borderColor: data.isHighlighted ? '#ff4d4f' : (selected ? '#1890ff' : '#d9d9d9'),
         flexDirection: 'column' as const,
         padding: '16px 12px',
-        minWidth: '250px',
+        minWidth: '400px',
         position: 'relative' as const,
       },
       managerContainer: {
@@ -191,7 +193,7 @@ const CustomNode: FC<CustomNodeProps> = ({ data, id, selected }) => {
         gap: '15px',
       },
       managerName: {
-        fontSize: '12px',
+        fontSize: '20px',
         fontWeight: 500,
         color: '#333',
         marginBottom: '4px',
@@ -203,11 +205,12 @@ const CustomNode: FC<CustomNodeProps> = ({ data, id, selected }) => {
         border: `1px solid ${managerGradeColor}40`,
         borderRadius: '4px',
         padding: '0 6px',
-        fontSize: '10px',
+        fontSize: '18px',
         fontWeight: 500,
         display: 'inline-block',
         textAlign: 'left',
-        whiteSpace: 'nowrap'
+        whiteSpace: 'nowrap',
+        
       },
       detailsButton: {
         position: 'absolute' as const,
@@ -258,8 +261,8 @@ const CustomNode: FC<CustomNodeProps> = ({ data, id, selected }) => {
             transform: 'rotate(90deg) translate(-50%, -50%)',
             transformOrigin: 'left top'
           }}> {structure?.type?.name} </Tag>
-          <ApartmentOutlined style={{ fontSize: '24px', color: structure?.type?.color }} />
-          <Title level={5} style={{ margin: '8px 0', textAlign: 'center' }}>{structure.name}</Title>
+          <ApartmentOutlined style={{ fontSize: '40px', color: structure?.type?.color }} />
+          <Title level={5} style={{ margin: '8px 0', textAlign: 'center',fontSize:'20pt' }}>{structure.name}</Title>
         </div>
 
         {structure.manager && (

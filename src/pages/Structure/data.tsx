@@ -9,41 +9,40 @@ import AUForm from "./components/AUForm";
 import Print from "@/components/Print";
 import { SafetyCertificateOutlined } from "@ant-design/icons";
 import { Structure } from "@/types/reference";
+import DetailsButton from "@/components/DetailsButton";
 
-export const getMetas = (
+export const getColumns = (
   refetch: () => void,
-): ProListProps<Structure, any>['metas'] =>  ({
-  /** ---------- Main title (“Nom”) ---------- */
-  title: {
-    dataIndex: 'name',
-    title: 'Nom',
-  },
-
-
-  /** ---------- Status tag (“Etat”) ---------- */
-  subTitle: {
-    title: 'type',
-    render: (_,row:any) => (
-      <Tag color={row?.type?.color}>{row?.type?.name}</Tag>
-    ),
-  },
-
-  /** ---------- Date (“Créé le”) ---------- */
-  content: {
-   
-    render: (_, row:any) =><div><span>Créé le</span> <span style={{marginLeft:"5px",color:"#6c757d",fontWeight:"bold"}}> {renderDate(row.created_at)}</span></div> ,
-  },
-
-  /** ---------- Per‑card actions ---------- */
-  actions: {
-    // place them in the card’s top‑right corner (instead of bottom)
-    cardActionProps: 'extra',
-    render: (_, record) => (
-      <TableDropdown
-        key="actionGroup"
-        // children must be a single ReactNode; wrap items in <> if needed
-      >
-        <Row gutter={8}>
+): ProColumns<any>[] => [
+    {
+      title: "Nom",
+      dataIndex: "name",
+      key: "1",
+      render: (_,record: any) => <DetailsButton text={record?.name} navigate_to={`/structures/${record?.id}`} />
+    },
+    {
+      title: "Type",
+      key: "34",
+      dataIndex: "type",
+      render: (record: any) => <Tag color={record?.color}>{record?.name}</Tag>
+    },
+    {
+      title: "Responsable",
+      key: "34",
+      dataIndex: "manager",
+      render: (record: any) => renderText(record?.title)
+    },
+    {
+      title: "Actions",
+      valueType: "option",
+      key: "Actions",
+      fixed: "right",
+      width: 220,
+      render: (_, record: any) => [
+        <TableDropdown
+          key="actionGroup"
+          children={[
+            <Row gutter={8}>
           <Col>
             <Delete
               url={API_STRUCTURES_ENDPOINT}
@@ -65,86 +64,12 @@ export const getMetas = (
             />
           </Col>
         </Row>
-      </TableDropdown>
-    ),
-  },
-});
-
-export const getColumns = (
-  refetch: () => void,
-): ProColumns<any>[] => [
-    {
-      title: "Nom",
-      dataIndex: "name",
-      key: "1",
-      width: 100,
-    },
-    {
-      title: "Structure Parente",
-      dataIndex: ["parent", "name"],
-      key: "parent",
-      width: 100,
-    },
-    {
-      title: "Etat",
-      key: "2",
-      dataIndex: "state",
-      width: 150,
-      render: (row:any) => (
-        <Space>
-          <Tag color={getStatusColor(row.status)}>{row.status}</Tag>
-          {/* Other content */}
-        </Space>
-      )
-    },
-    {
-      title: "Cree le",
-      key: "3",
-      dataIndex: "created_at",
-      width: 150,
-      render: (record: any) => renderDate(record),
-    },
-
-    {
-      title: "Actions",
-      valueType: "option",
-      key: "Actions",
-      fixed: "right",
-      width: 220,
-      render: (_, record: any) => [
-        <TableDropdown
-          key="actionGroup"
-          children={[
-            <Row gutter={8}>
-
-              <Col>
-                <Delete
-                  url={API_STRUCTURES_ENDPOINT}
-                  id={record?.id}
-                  refetch={refetch}
-                  class_name="Structure"
-                  type="dashed"
-                  link={false}
-                  text=""
-                  has_icon
-                  permission="app.delete_tc"
-                />
-              </Col>
-              <Col>
-                <AUForm
-                  initialvalues={record}
-                  refetch={refetch}
-                  editText=""
-                  hasIcon
-                />
-              </Col>
-           
-            </Row>,
           ]}
         />,
       ],
     },
   ];
+
 
 export const columns = [
   {

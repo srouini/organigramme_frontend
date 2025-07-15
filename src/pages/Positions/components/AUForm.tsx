@@ -11,6 +11,7 @@ import { YES_NO_CHOICES } from "@/utils/constants";
 import { EditOutlined, PlusOutlined } from "@ant-design/icons";
 import { usePermissions } from "@/utils/permissions";
 import TextArea from "antd/es/input/TextArea";
+import AddGrade from "@/components/references/AddGrade";
 
 const formatDate = (field: string, values: any) => {
   if (values[field]) values[field] = values[field].format("YYYY-MM-DD");
@@ -61,7 +62,6 @@ useEffect(()=>{
     message.success("Submission successful");
     setOpen(false);
     refetch();
-    positions?.refetch();
   };
 
   const { mutate, isLoading } = usePost({
@@ -131,6 +131,11 @@ useEffect(()=>{
             option_label="name"
             required
             span_md={24}
+            addFormComponent={AddGrade}
+            onAddItem={(newRecord:any) => {                          
+              form.setFieldValue('grade', newRecord.id);
+              grades?.refetch();
+            }}
           />
           <FormField
             name="category"
