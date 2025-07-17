@@ -54,6 +54,8 @@ useEffect(()=>{
     if (initialvalues) {
       values.id = initialvalues?.id;
     }
+    console.log(values)
+    if (values['structure'] ===undefined) values.structure = null;
 
     mutate(values);
   };
@@ -62,6 +64,7 @@ useEffect(()=>{
     message.success("Submission successful");
     setOpen(false);
     refetch();
+    positions?.refetch();
   };
 
   const { mutate, isLoading } = usePost({
@@ -89,7 +92,7 @@ useEffect(()=>{
       isLoading={isLoading}
       initialvalues={initialvalues}
     >
-      <FormObject form={form} initialvalues={mapInitialValues(initialvalues)}>
+      <FormObject form={form} initialvalues={mapInitialValues(initialvalues? initialvalues : {mission_principal:"",formation:"",experience:"",quantity:1})}>
         <Row gutter={24}>
 
           <FormField
@@ -98,15 +101,6 @@ useEffect(()=>{
             type="select"
             options={structures?.results}
             option_label="name"
-            required
-            span_md={24}
-          />
-          <FormField
-            name="parent"
-            label="Supérieur Hiérarchique"
-            type="select"
-            options={positions?.results?.filter((p: any) => p.id !== initialvalues?.id)}
-            option_label="title"
             span_md={24}
           />
           <Divider style={{ marginTop: "0px" }} />
@@ -146,7 +140,7 @@ useEffect(()=>{
           />
           <Divider style={{ marginTop: "0px" }} />
 
-          <Form.Item label="Mission Principale" name="mission_principal" required style={{ width: '100%' }}>
+          <Form.Item label="Mission Principale" name="mission_principal" style={{ width: '100%' }}>
             <TextArea rows={4} />
           </Form.Item>
 
@@ -154,14 +148,14 @@ useEffect(()=>{
             name="formation"
             label="Formation"
             type="text"
-            required
+            
             span_md={24}
           />
           <FormField
             name="experience"
             label="Expérience"
             type="text"
-            required
+            
             span_md={24}
           />
           <FormField

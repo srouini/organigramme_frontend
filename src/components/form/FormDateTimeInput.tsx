@@ -13,7 +13,7 @@ interface FormDateInputProps extends Omit<FormItemProps, "children"> {
   hasAddOn?: boolean;
   inputColSpan?: number;
   addonColSpan?: number;
-  disabled?:boolean; 
+  disabled?:boolean;
   maxDate?:any;
 }
 

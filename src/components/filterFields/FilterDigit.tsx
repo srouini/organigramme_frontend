@@ -69,7 +69,7 @@ const FilterDigit: React.FC<ProNumberInputProps> = ({
       min={min}
       max={max}
       addonAfter={suffixElement}
-      transform={(value) => ({ [`${name}${"__"+suffix}`]: value })}
+      transform={(value: any) => ({ [`${name}${"__"+suffix}`]: value })}
 
     />
   );

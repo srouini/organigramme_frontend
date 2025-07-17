@@ -18,10 +18,7 @@ interface AddConnexionProps {
 const AddConnexion: React.FC<AddConnexionProps> = ({ source, onSuccess: onSuccessProp }) => {
   const [form] = Form.useForm();
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [isNewStructureModalOpen, setIsNewStructureModalOpen] = useState(false);
   const { structuresUnonnected } = useReferenceContext();
-  const [newStructureForm] = Form.useForm();
-  const { success, error } = message.useMessage();
 
   // Fetch structures when the component mounts
   useEffect(() => {

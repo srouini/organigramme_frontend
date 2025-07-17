@@ -37,6 +37,10 @@ const QueryFilters: React.FC<QueryFiltersProps> = ({
 
   const { grades, structures } = useReferenceContext();
 
+  useEffect(() => {
+    grades?.fetch();
+    structures?.fetch();
+  },[])
 
 
   return (
@@ -67,7 +71,7 @@ const QueryFilters: React.FC<QueryFiltersProps> = ({
         />
         <ProFormSelect
           {...selectConfig}
-          options={structures?.data}
+          options={structures?.results}
           label="Structure"
           labelCol={{ span: 6 }}
           name="structure__in"

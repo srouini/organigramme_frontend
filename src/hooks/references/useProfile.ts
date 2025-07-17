@@ -1,6 +1,5 @@
 import { useEffect, useState } from "react";
 import useData from "../useData";
-import { Profile } from "@/types/reference";
 import { API_USER_PROFILE_ENDPOINT } from "@/api/api";
 
 interface UseUserResult {
@@ -12,7 +11,7 @@ interface UseUserResult {
 }
 
 const useUser = (): UseUserResult => {
-    const [results, setResults] = useState<Profile>();
+    const [results, setResults] = useState<any>();
 
     const { data, isLoading, isRefetching, refetch } = useData({
       endpoint: API_USER_PROFILE_ENDPOINT,

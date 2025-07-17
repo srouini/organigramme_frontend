@@ -5,7 +5,7 @@ import type { SelectProps } from "antd/es/select";
 
 interface FormTextInputProps extends Omit<FormItemProps, "children"> {
   name: string;
-  label: string;
+  label?: string;
   placeholder?: string;
   required?: boolean;
   message?: string;

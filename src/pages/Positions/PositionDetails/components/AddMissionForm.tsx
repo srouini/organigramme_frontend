@@ -48,11 +48,10 @@ const AddMissionForm: React.FC<AUFormProps> = ({
       <Row style={{ width: '100%', margin: 0, flexWrap: 'nowrap' }}>
         <div style={{ flex: 1, marginRight: 8 }}>
           <FormTextInput
-            name="description"
-        
-            placeholder="Responsabilité"
-            style={{ width: '100%' }}
-          />
+              name="description"
+
+              placeholder="Responsabilité"
+              style={{ width: '100%' }} label={""}          />
         </div>
         <Form.Item style={{ margin: 0 }}>
           <Button 

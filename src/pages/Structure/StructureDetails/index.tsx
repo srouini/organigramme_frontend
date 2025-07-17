@@ -161,6 +161,7 @@ export default () => {
         .map((dp: DiagramPosition) => {
           let type = 'unknown';
           if (typeof dp.content_type === 'string') {
+            // @ts-ignore
             type = dp.content_type.toLowerCase();
           } else if (typeof dp.content_type === 'object' && dp.content_type !== null) {
             type = (dp.content_type.model || '').toLowerCase();
@@ -173,6 +174,7 @@ export default () => {
     );
 
     const getNodePosition = (type: string, id: string, defaultX: number = 0, defaultY: number = 0) => {
+      // @ts-ignore
       const position = diagramPositionMap.get(`${type}-${id}`);
       return position || { x: defaultX, y: defaultY };
     };

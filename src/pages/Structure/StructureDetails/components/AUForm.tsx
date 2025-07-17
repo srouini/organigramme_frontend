@@ -230,7 +230,6 @@ const AUForm: React.FC<AUFormProps> = ({
               option_label="name"
               option_value="id"
               span_md={24}
-              allowClear
             />
           </Row>
           <FormField

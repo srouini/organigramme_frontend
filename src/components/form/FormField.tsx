@@ -164,6 +164,7 @@ const FormField: React.FC<FormFieldProps> = ({
             valueEnum={
               options?.length
                 ? options.reduce((acc: any, curr: any) => {
+                  // @ts-ignore
                     acc[curr[option_value]] = curr[option_label];
                     return acc;
                   }, {})

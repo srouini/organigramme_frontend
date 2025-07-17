@@ -1,5 +1,5 @@
 // Determine the API endpoint based on environment
-export const API_ENDPOINT = `http://${window.location.hostname}:8000`;
+export const API_ENDPOINT = `http://${window.location.hostname}:8887`;
 
 export const CONTAINER_NATURE_CHOICES = [
   {

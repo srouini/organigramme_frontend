@@ -57,7 +57,6 @@ export const getColumns = (
                 <AUForm
                   initialvalues={record}
                   refetch={refetch}
-                  article={record?.article}
                   editText=""
                   hasIcon
                 />

@@ -1,21 +1,12 @@
 import {
-  ProFormDatePicker,
-  ProFormDateRangePicker,
-  ProFormDigit,
-  ProFormSelect,
   ProFormText,
   QueryFilter,
 } from "@ant-design/pro-components";
 import { useEffect } from "react";
 
-import {
-  transformRangeDateFilter,
-  transformSelectFilter,
-} from "@/utils/functions";
-import { selectConfig } from "@/utils/config";
 import { useReferenceContext } from "@/context/ReferenceContext";
-import { STRUCTURE_STATES, YES_NO_CHOICES } from "@/utils/constants";
 import { Card } from "antd";
+import FormField from "@/components/form/FormField";
 
 type QueryFiltersProps = {
   setPage: React.Dispatch<React.SetStateAction<number>>;
@@ -35,6 +26,12 @@ const QueryFilters: React.FC<QueryFiltersProps> = ({
     setFilters(values);
   };
 
+  const { structureTypes, positions } = useReferenceContext();
+
+  useEffect(() => {
+    structureTypes?.fetch();
+  }, [])
+
   return (
     <Card style={{ marginBottom: "20px" }}>
       <QueryFilter
@@ -44,31 +41,33 @@ const QueryFilters: React.FC<QueryFiltersProps> = ({
         style={{ padding: "0px" }}
         defaultCollapsed={collapsed}
       >
-        <ProFormText name="name__icontains" label="Nom" />
+        <ProFormText name="name" label="Nom" />
 
-        <ProFormSelect
-          {...selectConfig}
-          // @ts-ignore
-          options={STRUCTURE_STATES}
-          label="Etat"
-          name="state__icontains"
+
+        <FormField
+          type="select"
+          name="type"
+          label="Type"
+          options={structureTypes?.results}
+          option_label="name"
+          option_value="id"
+          span_md={24}
           mode="single"
-        />
-        
-        <ProFormDatePicker name="created_at__date" label="Date" />
 
-
-
-
-        <ProFormDateRangePicker
-          name="dcreated_at__date__range"
-          label="Date"
-          transform={(value) =>
-            transformRangeDateFilter("date_reception__date", value)
-          }
         />
 
 
+        <FormField
+          type="select"
+          name="manager"
+          label="Responsable"
+          options={positions?.results}
+          option_label="title"
+          option_value="id"
+          span_md={24}
+          mode="single"
+
+        />
       </QueryFilter>
     </Card>
   );

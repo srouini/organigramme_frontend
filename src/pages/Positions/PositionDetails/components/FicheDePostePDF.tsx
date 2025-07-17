@@ -1,5 +1,6 @@
 import React from 'react';
 import { Page, Text, View, Document, StyleSheet, Font, Image, pdf, Svg } from '@react-pdf/renderer';
+import { Competence, Mission, Position } from '@/types/reference';
 
 // Register fonts and add logo images (replace with your actual logo paths)
 Font.register({
@@ -101,29 +102,7 @@ const styles = StyleSheet.create({
   },
 });
 
-interface FicheDePosteProps {
-  position: {
-    title: string;
-    grade?: {
-      name: string;
-      color?: string;
-    };
-    formation?: string;
-    experience?: string;
-  };
-  missions: {
-    data: Array<{
-      id: number;
-      description: string;
-    }>;
-  };
-  competences: {
-    data: Array<{
-      id: number;
-      description: string;
-    }>;
-  };
-}
+
 
 // Replace these with your actual logo components or images
 const LeftLogo = () => (
@@ -134,7 +113,7 @@ const LeftLogo = () => (
 );
 
 
-const FicheDePoste = ({ position, missions, competences }: FicheDePosteProps) => {
+const FicheDePoste = ({ position, missions, competences }: any) => {
   let pageNumber = 1;
   const totalPages = React.useRef(1);
 

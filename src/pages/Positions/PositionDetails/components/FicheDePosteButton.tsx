@@ -6,12 +6,8 @@ import { Competence, Mission, Position } from '@/types/reference';
 
 interface FicheDePosteProps {
     position: Position;
-    missions: {
-      data: Mission[];
-    };
-    competences: {
-      data: Competence[];
-    };
+    missions: Mission;
+    competences: Competence
   }
 
 export const FicheDePosteButton = ({ position, missions, competences }: FicheDePosteProps) => {

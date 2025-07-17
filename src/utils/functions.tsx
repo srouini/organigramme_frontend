@@ -19,7 +19,7 @@ type InitialValues = {
 };
 
 import utc from 'dayjs/plugin/utc';
-import { Rubrique } from "@/types/bareme";
+
 dayjs.extend(utc); 
 
 export const renderDateTime = (date: any) => {
@@ -112,7 +112,7 @@ export const transformSelectFilter = (
 };
 
 
-export function removeDuplicatedRubriques(prestations: Rubrique[]): Rubrique[] {
+export function removeDuplicatedRubriques(prestations: any): any {
   let uniqueDesignations: { [key: string]: boolean } = {};
   return prestations?.filter(item => {
     if (!uniqueDesignations[item.designation]) {

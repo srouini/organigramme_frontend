@@ -15,6 +15,7 @@ import { Background } from 'reactflow';
 import { WrapText } from 'lucide-react';
 import AUForm from '@/pages/Positions/components/AUForm';
 import { useReferenceContext } from '@/context/ReferenceContext';
+import RemovePositionEdge from './RemovePositionEdge';
 
 const { Title } = Typography;
 
@@ -116,13 +117,14 @@ const CustomNode: FC<CustomNodeProps> = ({ data, id, selected }) => {
             <Col>
             
               <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: '6px' }}>
-                <Tooltip title="View details" placement="top">
+                {/* <Tooltip title="View details" placement="top">
                   <Button
                     type="default"
                     icon={<ExpandAltOutlined />}
                     onClick={handleExpandClick}
                   />
-                </Tooltip>
+                </Tooltip> */}
+                <RemovePositionEdge position={position} />
                 <PositionDetails position={position} node={true} />
               </div>
             </Col>
@@ -188,7 +190,7 @@ const CustomNode: FC<CustomNodeProps> = ({ data, id, selected }) => {
       },
       managerContent: {
         display: 'flex',
-        flexWrap: 'nowrap',
+        flexWrap: 'nowrap' as const,
         justifyContent: 'space-between',
         gap: '15px',
       },
@@ -197,7 +199,7 @@ const CustomNode: FC<CustomNodeProps> = ({ data, id, selected }) => {
         fontWeight: 500,
         color: '#333',
         marginBottom: '4px',
-        textAlign: 'left',
+        textAlign: 'left' as const,
       },
       gradeBadge: {
         backgroundColor: `${managerGradeColor}20`,
@@ -208,9 +210,8 @@ const CustomNode: FC<CustomNodeProps> = ({ data, id, selected }) => {
         fontSize: '18px',
         fontWeight: 500,
         display: 'inline-block',
-        textAlign: 'left',
+        textAlign: 'left' as const,
         whiteSpace: 'nowrap',
-        
       },
       detailsButton: {
         position: 'absolute' as const,

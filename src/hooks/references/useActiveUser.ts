@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import useData from "../useData";
-import { Client } from "@/types/reference";
+import { User } from "@/types/reference";
 import { API_USERS_ENDPOINT } from "@/api/api";
 
 interface UseUserResult {
@@ -12,7 +12,7 @@ interface UseUserResult {
 }
 
 const useUser = (): UseUserResult => {
-    const [results, setResults] = useState<Client[]>();
+    const [results, setResults] = useState<User[]>();
 
     const { data, isLoading, isRefetching, refetch } = useData({
       endpoint: API_USERS_ENDPOINT,
